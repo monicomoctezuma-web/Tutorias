@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle PAT por Carrera</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-book me-2"></i> Detalle PAT por Carrera</h4>
+            <p>Información completa del PAT asignado a la carrera</p>
+        </div>
+        <a th:href="@{/patcarrera/lista}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- INFORMACIÓN GENERAL -->
+    <div class="detalle-card" style="max-width: 950px;">
+        <div class="card-header-custom">
+            <i class="fas fa-info-circle"></i> Información General
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">PAT General</span>
+                <span class="info-value" th:text="${patCarrera.pat.titulo}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estatus</span>
+                <span th:if="${patCarrera.estatus == 1}" class="badge-activo">✔ Activo</span>
+                <span th:if="${patCarrera.estatus != 1}" class="badge-inactivo">✘ Inactivo</span>
+            </div>
+            <div class="info-item" style="grid-column: span 2;">
+                <span class="info-label">Descripción</span>
+                <span class="info-value" th:text="${patCarrera.pat.descripcion}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Carrera</span>
+                <span class="info-value" th:text="${patCarrera.carrera.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Semestre</span>
+                <span class="info-value" th:text="${patCarrera.semestre.nombre}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVIDADES -->
+    <div class="tabla-card" style="max-width: 950px;">
+        <div class="card-header-custom">
+            <i class="fas fa-list-check"></i> Actividades
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th><i class="fas fa-tag me-1"></i> Nombre</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Semana</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(patCarrera.actividades)}">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No hay actividades registradas</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="a, iterStat : ${patCarrera.actividades}" th:if="${a.estatus == 1}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td>
+                            <span class="tutor-nombre" th:text="${a.nombre}"></span>
+                        </td>
+                        <td th:text="${a.descripcion}"></td>
+                        <td class="text-center" th:text="${a.semana}"></td>
+                        <td th:text="${a.fecha}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="d-flex gap-2">
+        <a th:href="@{/patcarrera/editar/{id}(id=${patCarrera.idPatCarrera})}"
+           class="btn-accion btn-editar" style="padding: 0.5rem 1.2rem; font-size:0.9rem;">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+        <a th:href="@{/patcarrera/lista}" class="btn-regresar">
+            <i class="fas fa-arrow-left"></i> Regresar
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--  <html xmlns:th="http://www.thymeleaf.org">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>Sistema de Tutorías</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:fragment="header">
+
+  <!--    <div class="topbar">
+    <h1><i class="fas fa-graduation-cap"></i> &nbsp; Sistema de Gestión de Tutorías — ITCH</h1>
+    <div style="display:flex; align-items:center; gap:1rem;">
+        <span><i class="fas fa-user-circle"></i> Tecnológico de Chilpancingo</span>
+        <a href="/logout/confirmar" style="background:rgba(255,255,255,0.2); color:white;
+           border-radius:50px; padding:0.3rem 1rem; font-size:0.85rem; font-weight:600;
+           text-decoration:none; display:flex; align-items:center; gap:0.4rem;
+           border:1px solid rgba(255,255,255,0.4);">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+    </div>
+</div>-->
+
+<div class="topbar">
+    <h1><i class="fas fa-graduation-cap"></i> &nbsp; Sistema de Gestión de Tutorías — ITCH</h1>
+    <div style="display:flex; align-items:center; gap:1rem;">
+        <span>
+            <i class="fas fa-user-circle"></i>
+            <span sec:authentication="name"></span>
+            <span sec:authorize="hasRole('ADMINISTRADOR')">&nbsp;— Administrador</span>
+            <span sec:authorize="hasRole('TUTOR')">&nbsp;— Tutor</span>
+            <span sec:authorize="hasRole('COORDINADOR_INSTITUCIONAL')">&nbsp;— Coordinador Institucional</span>
+            <span sec:authorize="hasRole('COORDINADOR_CARRERA')">&nbsp;— Coordinador de Carrera</span>
+            <span sec:authorize="hasRole('JEFE_ACADEMICO')">&nbsp;— Jefe Académico</span>
+            <span sec:authorize="hasRole('DESARROLLO_ACADEMICO')">&nbsp;— Desarrollo Académico</span>
+            
+        </span>
+        <a href="/logout/confirmar" style="background:rgba(255,255,255,0.2); color:white;
+           border-radius:50px; padding:0.3rem 1rem; font-size:0.85rem; font-weight:600;
+           text-decoration:none; display:flex; align-items:center; gap:0.4rem;
+           border:1px solid rgba(255,255,255,0.4);">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+    </div>
+</div>
+
+    <div class="sidebar">
+
+    <!-- ADMINISTRADOR -->
+    <div sec:authorize="hasRole('ADMINISTRADOR')">
+        <div class="menu-section">Menú</div>
+        <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
+
+        <div class="menu-section">Catálogos</div>
+        <a th:href="@{/usuario/usuarios}"><i class="fas fa-users"></i> Usuarios</a>
+        <a th:href="@{/rol/roles}"><i class="fas fa-user-tag"></i> Roles</a>
+        <a th:href="@{/carrera/carreras}"><i class="fas fa-graduation-cap"></i> Carreras</a>
+        <a th:href="@{/semestre/semestres}"><i class="fas fa-calendar-alt"></i> Semestres</a>
+        <a th:href="@{/coordinador/coordinadores}"><i class="fas fa-user-tie"></i> Coordinadores</a>
+         <a th:href="@{/jefe/jefes}"><i class="fas fa-user-shield"></i> Jefes Académicos</a>  <!-- NUEVO --> 
+          
+          
+        <div class="menu-section">Tutorías</div>
+        <a th:href="@{/tutor/tutores}"><i class="fas fa-chalkboard-teacher"></i> Tutores</a>
+        <a th:href="@{/tutorado/tutorados}"><i class="fas fa-user-graduate"></i> Tutorados</a>
+        <a th:href="@{/asignacion/lista}"><i class="fas fa-list-check"></i> Asignaciones</a>
+        <a th:href="@{/sesion/tutor}"><i class="fas fa-user-clock"></i> Portal Tutor</a>
+        <a th:href="@{/asistencia/registrar}"><i class="fas fa-clipboard-list"></i> Registrar Asistencia</a>
+        <a th:href="@{/asistencia/porcentajes}"><i class="fas fa-chart-bar"></i> Porcentajes de Asistencia</a>
+         <a th:href="@{/reporte/reportes}"><i class="fas fa-file-alt"></i> Reportes</a>
+       <!--  <a th:href="@{/pdf/tutorados}"><i class="fas fa-file-alt"></i> Oficio de Asignación</a>-->
+        <a th:href="@{/necesidad/necesidades}"><i class="fas fa-exclamation-circle"></i> Necesidades</a>
+
+        <div class="menu-section">Constancias</div>
+        <a th:href="@{/constancia/constancias}"><i class="fas fa-certificate"></i> Constancias</a>
+        <a th:href="@{/constancia/generarConstancias}"><i class="fas fa-award"></i> Generar Constancias</a>
+
+        <div class="menu-section">PAT</div>
+        <a th:href="@{/pat/pats}"><i class="fas fa-file-alt"></i> PAT</a>
+        <a th:href="@{/patcarrera/lista}"><i class="fas fa-book"></i> PAT Carrera</a>
+    </div>
+
+    <!-- TUTOR -->
+    <div sec:authorize="hasRole('TUTOR')">
+        <div class="menu-section">Menú</div>
+        <a th:href="@{/tutor/inicio}"><i class="fas fa-home"></i> Inicio</a>
+
+        <div class="menu-section">Mis Tutorías</div>
+        <a th:href="@{/asistencia/registrar}"><i class="fas fa-clipboard-list"></i> Registrar Asistencia</a>
+        <a th:href="@{/sesion/tutor}"><i class="fas fa-user-clock"></i> Portal Tutor</a>
+        <a th:href="@{/necesidad/necesidades}"><i class="fas fa-exclamation-circle"></i> Necesidades</a>
+        <a th:href="@{/reporte/reportes}"><i class="fas fa-file-alt"></i> Reportes</a>
+        
+    </div>
+    
+    <!-- COORDINADOR INSTITUCIONAL -->
+<div sec:authorize="hasRole('COORDINADOR_INSTITUCIONAL')">
+    <div class="menu-section">Menú</div>
+   <a th:href="@{/coordinador/inicioCoordinadorInstitucional}"><i class="fas fa-home"></i> Inicio</a>
+
+    <div class="menu-section">Gestión</div>
+    <a th:href="@{/coordinador/coordinadores}"><i class="fas fa-user-tie"></i> Coordinadores</a>
+     <a th:href="@{/jefe/jefes}"><i class="fas fa-user-shield"></i> Jefes Académicos</a>
+</div>
+
+<!-- COORDINADOR CARRERA -->
+<div sec:authorize="hasRole('COORDINADOR_CARRERA')">
+    <div class="menu-section">Menú</div>
+    <a th:href="@{/coordinador/inicioCoordinadorCarrera}"><i class="fas fa-home"></i> Inicio</a>
+
+    <div class="menu-section">Gestión</div>
+    <a th:href="@{/asignacion/lista}"><i class="fas fa-users"></i> Asignaciones</a>
+    <a th:href="@{/asistencia/porcentajes}"><i class="fas fa-chart-bar"></i> Porcentajes</a>
+    <a th:href="@{/patcarrera/lista}"><i class="fas fa-book"></i> PAT Carrera</a>
+    <a th:href="@{/necesidad/necesidades}"><i class="fas fa-exclamation-circle"></i> Necesidades</a>
+    <a th:href="@{/reporte/reportes}"><i class="fas fa-file-alt"></i> Reportes</a>
+    <a th:href="@{/constancia/generarConstancias}"><i class="fas fa-award"></i> Generar Constancias</a>
+    
+</div>
+
+<!-- JEFE ACADEMICO -->
+<div sec:authorize="hasRole('JEFE_ACADEMICO')">
+    <div class="menu-section">Menú</div>
+    <a th:href="@{/coordinador/inicioJefeAcademico}"><i class="fas fa-home"></i> Inicio</a>
+
+    <div class="menu-section">Gestión</div>
+    <a th:href="@{/asignacion/lista}"><i class="fas fa-users"></i> Asignaciones</a>
+    <a th:href="@{/patcarrera/lista}"><i class="fas fa-book"></i> PAT Carrera</a>
+
+    <div class="menu-section">Constancias</div>
+    <a th:href="@{/constancia/constancias}"><i class="fas fa-certificate"></i> Constancias</a>
+    <a th:href="@{/constancia/generarConstancias}"><i class="fas fa-award"></i> Generar Constancias</a>
+</div>
+
+<!-- DESARROLLO ACADEMICO -->
+<div sec:authorize="hasRole('DESARROLLO_ACADEMICO')">
+    <div class="menu-section">Menú</div>
+    <a th:href="@{/coordinador/inicioDesarrolloAcademico}"><i class="fas fa-home"></i> Inicio</a>
+
+    <div class="menu-section">Gestión</div>
+    <a th:href="@{/pat/pats}"><i class="fas fa-file-alt"></i> PAT General</a>
+    <a th:href="@{/semestre/semestres}"><i class="fas fa-calendar-alt"></i> Semestres</a>
+    <a th:href="@{/constancia/generarConstancias}"><i class="fas fa-certificate"></i> Generar Constancias</a>
+    <a th:href="@{/constancia/constancias}"><i class="fas fa-certificate"></i> Constancias</a>
+    <a th:href="@{/asistencia/porcentajes}"><i class="fas fa-chart-bar"></i> Porcentajes</a>
+    <a th:href="@{/carrera/carreras}"><i class="fas fa-graduation-cap"></i> Carreras</a>
+    <a th:href="@{/usuario/usuarios}"><i class="fas fa-users"></i> Usuarios</a>
+    <a th:href="@{/rol/roles}"><i class="fas fa-user-tag"></i> Roles</a>
+<a th:href="@{/tutor/tutores}"><i class="fas fa-chalkboard-teacher"></i> Tutores</a>
+<a th:href="@{/tutorado/tutorados}"><i class="fas fa-user-graduate"></i> Tutorados</a>
+</div>
+
+
+
+</div>
+
+<footer th:fragment="footer">
+    <div class="footer-bar">
+        &copy; 2026 Sistema de Tutorías — Tecnológico de Chilpancingo
+    </div>
+</footer>
+
+</body>
+</html>

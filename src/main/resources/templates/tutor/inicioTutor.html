@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio Tutor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-home me-2"></i> Bienvenido, Tutor</h4>
+            <p>Selecciona una opción para continuar</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-md-6">
+            <div class="card shadow text-center p-4">
+                <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
+                <h5>Registrar Asistencia</h5>
+                <p class="text-muted">Registra la asistencia de tus tutorados en cada sesión.</p>
+                <a th:href="@{/asistencia/registrar}" class="btn btn-primary mt-2">
+                    <i class="fas fa-arrow-right me-1"></i> Ir
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow text-center p-4">
+                <i class="fas fa-user-clock fa-3x text-success mb-3"></i>
+                <h5>Portal Tutor</h5>
+                <p class="text-muted">Consulta y registra las actividades de tus sesiones.</p>
+                <a th:href="@{/sesion/tutor}" class="btn btn-success mt-2">
+                    <i class="fas fa-arrow-right me-1"></i> Ir
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+    <div class="card shadow text-center p-4">
+        <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+        <h5>Necesidades</h5>
+        <p class="text-muted">Registra y consulta las necesidades detectadas en tus sesiones.</p>
+        <a th:href="@{/necesidad/necesidades}" class="btn btn-warning mt-2">
+            <i class="fas fa-arrow-right me-1"></i> Ir
+        </a>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="card shadow text-center p-4">
+        <i class="fas fa-file-alt fa-3x text-info mb-3"></i>
+        <h5>Reportes</h5>
+        <p class="text-muted">Registra y consulta tus reportes de sesiones de tutoría.</p>
+        <a th:href="@{/reporte/reportes}" class="btn btn-info mt-2">
+            <i class="fas fa-arrow-right me-1"></i> Ir
+        </a>
+    </div>
+</div>
+
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

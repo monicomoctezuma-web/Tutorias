@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Asignación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-chalkboard-teacher me-2"></i> Detalle de Asignación</h4>
+            <p>Información completa de la asignación y tutorados asignados</p>
+        </div>
+        <a th:href="@{/asignacion/lista}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- INFORMACIÓN -->
+    <div class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-info-circle"></i> Información de la Asignación
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">ID</span>
+                <span class="info-value" th:text="${asignacion.idAsignacion}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estatus</span>
+                <span th:if="${asignacion.estatus == 1}" class="badge-activo">✔ Activo</span>
+                <span th:if="${asignacion.estatus != 1}" class="badge-inactivo">✘ Inactivo</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tutor</span>
+                <span class="info-value"
+                      th:text="${asignacion.tutor.nombre + ' ' + asignacion.tutor.apellido}">
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Carrera</span>
+                <span class="info-value" th:text="${asignacion.carrera.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Semestre</span>
+                <span class="info-value" th:text="${asignacion.semestre.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Aula</span>
+                <span class="info-value" th:text="${asignacion.aula}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Horario</span>
+                <span class="info-value" th:text="${asignacion.horario}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUTORADOS -->
+    <div class="tabla-card" style="max-width: 750px;">
+        <div class="card-header-custom">
+            <i class="fas fa-users"></i> Tutorados Asignados
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>No. Control</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(tutorados)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="fas fa-user-slash"></i>
+                                <p>No hay tutorados asignados</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="at : ${tutorados}">
+                        <td>
+                            <span class="numero-control"
+                                  th:text="${at.tutorado.numeroControl}">
+                            </span>
+                        </td>
+                        <td th:text="${at.tutorado.nombre}"></td>
+                        <td th:text="${at.tutorado.apellido}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

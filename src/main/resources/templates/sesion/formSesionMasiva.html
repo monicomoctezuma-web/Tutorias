@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sesión Masiva</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-calendar-plus me-2"></i> Registrar Sesión por Carrera</h4>
+            <p>Crea la sesión para todos los tutores de una carrera al mismo tiempo</p>
+        </div>
+        <a th:href="@{/sesion/sesiones}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <div class="form-card" style="max-width: 700px;">
+        <div class="card-header-custom">
+            <i class="fas fa-users"></i> Datos de la Sesión Masiva
+        </div>
+        <div class="p-4">
+            <form method="post" th:action="@{/sesion/sesiones/masivo/guardar}"
+                  onsubmit="return validarFormulario()">
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Carrera</label>
+                    <select class="form-select" name="idCarrera" id="selectCarrera"
+                            onchange="cargarActividades()">
+                        <option value="">-- Selecciona una carrera --</option>
+                        <option th:each="c : ${carreras}"
+                                th:value="${c.idCarrera}"
+                                th:text="${c.nombre}">
+                        </option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorCarrera"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Semana</label>
+                    <input type="number" name="semana" id="semana"
+                           class="form-control" min="1" max="10"
+                           placeholder="Ej. 1"
+                           oninput="filtrarPorSemana()">
+                    <div class="text-danger small mt-1" id="errorSemana"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Fecha <small class="text-muted">(solo viernes)</small></label>
+                    <input type="date" name="fecha" id="fecha" class="form-control">
+                    <div class="text-danger small mt-1" id="errorFecha"></div>
+                </div>
+
+                <div class="mb-3" id="divActividad" style="display:none;">
+                    <label class="form-label">Actividad del PAT</label>
+                    <select class="form-select" name="idActividad" id="selectActividad">
+                        <option value="">-- Selecciona una actividad --</option>
+                    </select>
+                </div>
+
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar para todos
+                    </button>
+                    <a th:href="@{/sesion/sesiones}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let todasActividades = [];
+
+    document.getElementById('fecha').addEventListener('change', function () {
+        const fecha = new Date(this.value + 'T00:00:00');
+        if (this.value && fecha.getDay() !== 5) {
+            this.value = '';
+            document.getElementById('errorFecha').textContent = '⚠ Solo se permiten viernes.';
+        } else {
+            document.getElementById('errorFecha').textContent = '';
+        }
+    });
+
+    function cargarActividades() {
+        const idCarrera = document.getElementById('selectCarrera').value;
+        const divActividad = document.getElementById('divActividad');
+        const selectActividad = document.getElementById('selectActividad');
+
+        todasActividades = [];
+        selectActividad.innerHTML = '<option value="">-- Selecciona una actividad --</option>';
+
+        if (!idCarrera) {
+            divActividad.style.display = 'none';
+            return;
+        }
+
+        fetch('/sesion/actividadesPorCarrera/' + idCarrera)
+            .then(response => response.json())
+            .then(actividades => {
+                todasActividades = actividades;
+                if (actividades.length === 0) {
+                    divActividad.style.display = 'none';
+                    return;
+                }
+                actividades.forEach(function(a) {
+                    const option = document.createElement('option');
+                    option.value = a.idActividad;
+                    option.textContent = 'Semana ' + a.semana + ' — ' + a.nombre;
+                    selectActividad.appendChild(option);
+                });
+                divActividad.style.display = '';
+                filtrarPorSemana();
+            });
+    }
+
+    function filtrarPorSemana() {
+        const semana = document.getElementById('semana').value.trim();
+        const selectActividad = document.getElementById('selectActividad');
+        const opciones = selectActividad.querySelectorAll('option');
+        opciones.forEach(function(op) {
+            if (op.value === '') return;
+            const numSemana = op.textContent.trim().split(' ')[1];
+            if (!semana || numSemana === semana) {
+                op.style.display = '';
+            } else {
+                op.style.display = 'none';
+            }
+        });
+        selectActividad.value = '';
+    }
+
+    function validarFormulario() {
+        let valido = true;
+        document.getElementById('errorCarrera').textContent = '';
+        document.getElementById('errorSemana').textContent = '';
+        document.getElementById('errorFecha').textContent = '';
+
+        if (!document.getElementById('selectCarrera').value) {
+            document.getElementById('errorCarrera').textContent = '⚠ Selecciona una carrera.';
+            valido = false;
+        }
+        if (!document.getElementById('semana').value) {
+            document.getElementById('errorSemana').textContent = '⚠ La semana es obligatoria.';
+            valido = false;
+        }
+        if (!document.getElementById('fecha').value) {
+            document.getElementById('errorFecha').textContent = '⚠ Selecciona una fecha (viernes).';
+            valido = false;
+        } else {
+            const dia = new Date(document.getElementById('fecha').value + 'T00:00:00').getDay();
+            if (dia !== 5) {
+                document.getElementById('errorFecha').textContent = '⚠ Solo se permiten viernes.';
+                valido = false;
+            }
+        }
+        return valido;
+    }
+</script>
+</body>
+</html>

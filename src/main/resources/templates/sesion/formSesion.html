@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4 th:text="${sesion.idSesion != null} ? 'Editar Sesión' : 'Registrar Sesión'"></h4>
+            <p>Completa los datos para guardar la sesión de tutoría</p>
+        </div>
+        <a th:href="@{/sesion/sesiones}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <div class="card-header-custom">
+            <i class="fas fa-calendar-alt"></i> Datos de la Sesión
+        </div>
+        <div class="p-4">
+            <form id="formSesion"
+                  th:action="@{/sesion/sesiones/guardar}"
+                  th:object="${sesion}"
+                  method="post"
+                  onsubmit="return validarFormulario()">
+
+                <input type="hidden" th:field="*{idSesion}">
+                <input type="hidden" id="idActividadActual" th:value="${sesion.actividad != null ? sesion.actividad.idActividad : 0}">
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Semana</label>
+                    <input type="number" th:field="*{semana}" id="semana"
+                           class="form-control"
+                           min="1" max="10" placeholder="Ej. 1">
+                    <div class="text-danger small mt-1" id="errorSemana"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Fecha <small class="text-muted">(solo viernes)</small></label>
+                    <input type="date"
+                           id="fecha"
+                           name="fecha"
+                           class="form-control"
+                           th:value="${sesion.fecha}">
+                    <div class="text-danger small mt-1" id="errorFecha"
+                         th:text="${errorFecha}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Asignación (Tutor - Carrera)</label>
+                    <select class="form-select" id="asignacion" th:field="*{asignacion.idAsignacion}">
+                        <option value="">-- Selecciona una asignación --</option>
+                        <option th:each="a : ${asignaciones}"
+                                th:value="${a.idAsignacion}"
+                                th:text="${a.tutor.nombre + ' ' + a.tutor.apellido + ' — ' + a.carrera.nombre}">
+                        </option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorAsignacion"></div>
+                </div>
+                
+               <div class="mb-3" id="divActividad" style="display:none;">
+    <label class="form-label campo-requerido">Actividad del PAT</label>
+    <select class="form-select" id="selectActividad" name="idActividad">
+        <option value="">-- Selecciona una actividad --</option>
+    </select>
+</div>
+        
+
+                <!-- Leyenda de campos obligatorios -->
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/sesion/sesiones}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    
+  const idActividadActual = parseInt(document.getElementById('idActividadActual').value) || 0;
+
+document.getElementById('fecha').addEventListener('change', function () {
+    const fecha = new Date(this.value + 'T00:00:00');
+    if (this.value && fecha.getDay() !== 5) {
+        this.value = '';
+        document.getElementById('errorFecha').textContent = '⚠ Solo se permiten viernes.';
+    } else {
+        document.getElementById('errorFecha').textContent = '';
+    }
+});
+
+function validarFormulario() {
+    let valido = true;
+    document.getElementById('errorSemana').textContent     = '';
+    document.getElementById('errorFecha').textContent      = '';
+    document.getElementById('errorAsignacion').textContent = '';
+    const semana     = document.getElementById('semana').value;
+    const fecha      = document.getElementById('fecha').value;
+    const asignacion = document.getElementById('asignacion').value;
+    if (semana === '') {
+        document.getElementById('errorSemana').textContent = '⚠ La semana es obligatoria.';
+        valido = false;
+    }
+    if (fecha === '') {
+        document.getElementById('errorFecha').textContent = '⚠ Selecciona una fecha (viernes).';
+        valido = false;
+    } else {
+        const dia = new Date(fecha + 'T00:00:00').getDay();
+        if (dia !== 5) {
+            document.getElementById('errorFecha').textContent = '⚠ Solo se permiten viernes.';
+            valido = false;
+        }
+    }
+    if (asignacion === '') {
+        document.getElementById('errorAsignacion').textContent = '⚠ Selecciona una asignación.';
+        valido = false;
+    }
+    return valido;
+}
+
+function filtrarPorSemana() {
+    const semana = document.getElementById('semana').value.trim();
+    const selectActividad = document.getElementById('selectActividad');
+    const opciones = selectActividad.querySelectorAll('option');
+    opciones.forEach(function(op) {
+        if (op.value === '') return;
+        const numSemana = op.textContent.trim().split(' ')[1];
+        if (!semana || numSemana === semana) {
+            op.style.display = '';
+        } else {
+            op.style.display = 'none';
+        }
+    });
+    if (idActividadActual === 0) {
+    selectActividad.value = '';
+}
+}
+
+document.getElementById('semana').addEventListener('input', filtrarPorSemana);
+
+document.getElementById('asignacion').addEventListener('change', function() {
+    const idAsignacion = this.value;
+    const divActividad = document.getElementById('divActividad');
+    const selectActividad = document.getElementById('selectActividad');
+
+    selectActividad.innerHTML = '<option value="">-- Selecciona una actividad --</option>';
+
+    if (idAsignacion === '') {
+        divActividad.style.display = 'none';
+        return;
+    }
+
+    fetch('/sesion/actividades/' + idAsignacion)
+        .then(response => response.json())
+        .then(actividades => {
+            if (actividades.length === 0) {
+                divActividad.style.display = 'none';
+                return;
+            }
+            actividades.forEach(function(a) {
+                const option = document.createElement('option');
+                option.value = a.idActividad;
+                option.textContent = 'Semana ' + a.semana + ' — ' + a.nombre;
+                if (a.idActividad == idActividadActual) {
+                    option.selected = true;
+                }
+                selectActividad.appendChild(option);
+            });
+            divActividad.style.display = '';
+            // filtrar por semana después de cargar
+            filtrarPorSemana();
+        });
+});
+
+window.addEventListener('DOMContentLoaded', function () {
+    const asignacion = document.getElementById('asignacion');
+    if (asignacion.value !== '') {
+        asignacion.dispatchEvent(new Event('change'));
+    }
+});  
+   
+</script>
+</body>
+</html>

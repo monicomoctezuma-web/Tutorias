@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-user me-2"></i> Detalle del Usuario</h4>
+            <p>Información completa del usuario seleccionado</p>
+        </div>
+        <a th:href="@{/usuario/usuarios}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FOTO -->
+    <div th:if="${usuario.foto != null}" class="text-center mb-4">
+        <img th:src="@{/fotos/usuarios/{foto}(foto=${usuario.foto})}"
+             alt="foto"
+             style="height:120px; width:120px; object-fit:cover; border-radius:50%;
+                    border:3px solid #1a3a5c; box-shadow: 0 4px 12px rgba(26,58,92,0.15);">
+    </div>
+
+    <!-- DETALLE -->
+    <div class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-info-circle"></i> Información del Usuario
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">ID</span>
+                <span class="info-value" th:text="${usuario.idUsuario}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Rol</span>
+                <span class="info-value" th:text="${usuario.rol.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Nombre</span>
+                <span class="info-value" th:text="${usuario.nombre}"></span>
+            </div>
+            
+            <div class="info-item">
+    <span class="info-label">No. Trabajador</span>
+    <span class="info-value" th:text="${usuario.numeroTrabajador}"></span>
+</div>
+            
+            <div class="info-item">
+                <span class="info-label">Apellido</span>
+                <span class="info-value" th:text="${usuario.apellido}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value" th:text="${usuario.telefono}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estatus</span>
+                <span th:if="${usuario.estatus == 1}" class="badge-activo">✔ Activo</span>
+                <span th:if="${usuario.estatus != 1}" class="badge-inactivo">✘ Inactivo</span>
+            </div>
+            
+           <div class="info-item">
+                <span class="info-label">Usuario</span>
+                <span th:if="${usuario.username != null and !#strings.isEmpty(usuario.username)}"
+                      class="info-value" th:text="${usuario.username}"></span>
+                <span th:if="${usuario.username == null or #strings.isEmpty(usuario.username)}"
+                      class="badge bg-secondary">Sin usuario</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Contraseña</span>
+                <span th:if="${usuario.password != null and !#strings.isEmpty(usuario.password)}"
+                      class="badge bg-success"><i class="fas fa-check"></i> Asignada</span>
+                <span th:if="${usuario.password == null or #strings.isEmpty(usuario.password)}"
+                      class="badge bg-danger">Sin contraseña</span>
+            </div> 
+        </div>
+    </div>
+
+    <!-- BOTÓN REGRESAR -->
+    <a th:href="@{/usuario/usuarios}" class="btn-regresar">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+    </a>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

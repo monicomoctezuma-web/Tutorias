@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Tutorado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-user-graduate me-2"></i> Detalle del Tutorado</h4>
+            <p>Información completa del tutorado seleccionado</p>
+        </div>
+        <a th:href="@{/tutorado/tutorados}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FOTO -->
+    <div th:if="${tutorado.foto != null}" class="text-center mb-4">
+        <img th:src="@{/fotos/tutorados/{foto}(foto=${tutorado.foto})}"
+             alt="foto"
+             style="height:120px; width:120px; object-fit:cover; border-radius:50%;
+                    border:3px solid #1a3a5c; box-shadow: 0 4px 12px rgba(26,58,92,0.15);">
+    </div>
+
+    <!-- DETALLE -->
+    <div class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-info-circle"></i> Información del Tutorado
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">ID</span>
+                <span class="info-value" th:text="${tutorado.idTutorado}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">No. Control</span>
+                <span class="numero-control" th:text="${tutorado.numeroControl}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Nombre</span>
+                <span class="info-value" th:text="${tutorado.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Apellido</span>
+                <span class="info-value" th:text="${tutorado.apellido}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Correo</span>
+                <span class="info-value" th:text="${tutorado.correo}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Carrera</span>
+                <span class="info-value" th:text="${tutorado.carrera.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estatus</span>
+                <span th:if="${tutorado.estatus == 1}" class="badge-activo">✔ Activo</span>
+                <span th:if="${tutorado.estatus != 1}" class="badge-inactivo">✘ Inactivo</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN REGRESAR -->
+    <a th:href="@{/tutorado/tutorados}" class="btn-regresar">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+    </a>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

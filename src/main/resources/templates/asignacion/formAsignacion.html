@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Asignación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4 th:text="${asignacion.idAsignacion != null}
+                ? 'Editar Asignación'
+                : 'Registrar Asignación'">
+            </h4>
+            <p>Completa los datos para guardar la asignación</p>
+        </div>
+        <a th:href="@{/asignacion/lista}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <div class="card-header-custom">
+            <i class="fas fa-chalkboard-teacher"></i> Datos de la Asignación
+        </div>
+        <div class="p-4">
+            <form th:action="@{/asignacion/guardar}" th:object="${asignacion}" method="post">
+                <input type="hidden" th:field="*{idAsignacion}">
+                <input type="hidden" th:field="*{estatus}">
+
+               <div class="mb-3">
+    <label class="form-label campo-requerido">Tutor</label>
+    <select th:field="*{tutor.idTutor}" class="form-select">
+        <option value="">-- Selecciona un tutor --</option>
+        <option th:each="t : ${tutores}"
+                th:value="${t.idTutor}"
+                th:text="${t.nombre + ' ' + t.apellido}">
+        </option>
+    </select>
+</div>
+
+              <!--    <div class="mb-3">
+                    <label class="form-label campo-requerido">Carrera</label>
+                    <select th:field="*{carrera.idCarrera}" id="selectCarrera"
+                            class="form-select" onchange="filtrarTutorados()">
+                        <option value="">-- Selecciona una carrera --</option>
+                        <option th:each="c : ${carreras}"
+                                th:value="${c.idCarrera}"
+                                th:text="${c.nombre}">
+                        </option>
+                    </select>
+                </div>-->
+                <div class="mb-3">
+    <label class="form-label campo-requerido">Carrera</label>
+    <select th:field="*{carrera.idCarrera}" id="selectCarrera"
+            class="form-select" onchange="filtrarTutorados()"
+            th:disabled="${carreraFija}">
+        <option value="">-- Selecciona una carrera --</option>
+        <option th:each="c : ${carreras}"
+                th:value="${c.idCarrera}"
+                th:text="${c.nombre}">
+        </option>
+    </select>
+    <!-- Campo oculto para enviar el valor cuando está deshabilitado -->
+    <input type="hidden" th:if="${carreraFija}"
+           name="carrera.idCarrera"
+           th:value="${asignacion.carrera.idCarrera}">
+</div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Semestre</label>
+                  <!--    <select th:field="*{semestre.idSemestre}" class="form-select">  -->
+                    <select th:field="*{semestre.idSemestre}" id="selectSemestre" class="form-select">
+                        <option value="">-- Selecciona un semestre --</option>
+                        <option th:each="s : ${semestres}"
+                                th:value="${s.idSemestre}"
+                                th:text="${s.nombre}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Aula</label>
+                    <input type="text" th:field="*{aula}" class="form-control"
+                           placeholder="Ej. A-101">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Horario</label>
+                    <input type="text" th:field="*{horario}" class="form-control"
+                           placeholder="Ej. Viernes 10:00 - 11:00">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Tutorados</label>
+                    <small class="text-muted d-block mb-2">
+                        <i class="fas fa-lock me-1"></i> Los tutorados en gris ya están asignados a otro tutor.
+                    </small>
+                    <div id="listaTutorados" class="border rounded p-3"
+                         style="max-height: 220px; overflow-y: auto;
+                                border-color: #e0e7ef !important;
+                                border-radius: 8px !important;">
+
+                        <div th:each="t : ${tutorados}"
+                             class="form-check mb-1 item-tutorado"
+                             th:attr="data-carrera=${t.carrera.idCarrera}">
+
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="idsTutorados"
+                                   th:value="${t.idTutorado}"
+                                   th:checked="${idsAsignados != null and #lists.contains(idsAsignados, t.idTutorado)}"
+                                   th:disabled="${idsOcupados != null and #lists.contains(idsOcupados, t.idTutorado)}"
+                                   th:classappend="${idsOcupados != null and #lists.contains(idsOcupados, t.idTutorado)} ? 'opacity-50'">
+
+                            <label class="form-check-label"
+                                   th:classappend="${idsOcupados != null and #lists.contains(idsOcupados, t.idTutorado)} ? 'text-muted'"
+                                   th:text="${t.nombre + ' ' + t.apellido + ' — ' + t.numeroControl
+                                             + (idsOcupados != null and #lists.contains(idsOcupados, t.idTutorado) ? ' (ocupado)' : '')}">
+                            </label>
+                        </div>
+
+                        <p id="sinTutorados" style="display:none; color:#888;">
+                            No hay tutorados para esta carrera.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Leyenda de campos obligatorios -->
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/asignacion/lista}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const semestreConAsignaciones = /*[[${semestreConAsignaciones}]]*/ [];
+    console.log("semestreConAsignaciones:", semestreConAsignaciones); 
+
+    // Guardar estado original de cada checkbox al cargar la página
+    const estadoOriginal = {};
+    document.querySelectorAll('.item-tutorado').forEach(function(item) {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        const label = item.querySelector('label');
+        const id = checkbox.value;
+        estadoOriginal[id] = {
+            disabled: checkbox.disabled,
+            opacity: checkbox.classList.contains('opacity-50'),
+            textoMuted: label.classList.contains('text-muted'),
+            texto: label.textContent
+        };
+    });
+
+    function desbloquearTutorados() {
+        document.querySelectorAll('.item-tutorado').forEach(function(item) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const label = item.querySelector('label');
+            checkbox.disabled = false;
+            checkbox.classList.remove('opacity-50');
+            label.classList.remove('text-muted');
+            label.textContent = label.textContent.replace(' (ocupado)', '');
+        });
+    }
+
+    function restaurarOcupados() {
+        document.querySelectorAll('.item-tutorado').forEach(function(item) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const label = item.querySelector('label');
+            const id = checkbox.value;
+            const original = estadoOriginal[id];
+            if (original) {
+                checkbox.disabled = original.disabled;
+                if (original.opacity) checkbox.classList.add('opacity-50');
+                else checkbox.classList.remove('opacity-50');
+                if (original.textoMuted) label.classList.add('text-muted');
+                else label.classList.remove('text-muted');
+                label.textContent = original.texto;
+                if (original.disabled) checkbox.checked = false;
+            }
+        });
+    }
+
+    document.getElementById('selectSemestre').addEventListener('change', function() {
+        const idSeleccionado = parseInt(this.value);
+        const esNuevoSemestre = !semestreConAsignaciones.includes(idSeleccionado);
+        if (esNuevoSemestre) {
+            desbloquearTutorados();
+        } else {
+            restaurarOcupados();
+        }
+    });
+
+    function filtrarTutorados() {
+        const idCarrera = document.getElementById('selectCarrera').value;
+        const items = document.querySelectorAll('.item-tutorado');
+        let visibles = 0;
+
+        items.forEach(function(item) {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const ocupado = checkbox.disabled;
+
+            if (idCarrera === '' || item.getAttribute('data-carrera') === idCarrera) {
+                item.style.display = '';
+                visibles++;
+            } else {
+                item.style.display = 'none';
+                if (!ocupado) checkbox.checked = false;
+            }
+        });
+
+        document.getElementById('sinTutorados').style.display =
+            visibles === 0 ? '' : 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        filtrarTutorados();
+    });
+    
+    // Si la carrera está fija, filtrar tutorados automáticamente al cargar
+window.addEventListener('DOMContentLoaded', function () {
+    filtrarTutorados();
+    /*[[${carreraFija}]]*/ 
+    const carreraFija = /*[[${carreraFija}]]*/ false;
+    if (carreraFija) {
+        document.getElementById('selectCarrera').dispatchEvent(new Event('change'));
+    }
+});
+    
+</script>
+</body>
+</html>

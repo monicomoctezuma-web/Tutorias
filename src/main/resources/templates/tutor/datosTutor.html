@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tutores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-chalkboard-teacher me-2"></i> Tutores</h4>
+            <p>Gestiona los tutores registrados en el sistema</p>
+        </div>
+        <a th:href="@{/tutor/tutores/nuevo}" class="btn-nueva">
+            <i class="fas fa-plus me-1"></i> Nuevo Tutor
+        </a>
+    </div>
+
+    <!-- FILTRO POR CARRERA -->
+    <div class="filtro-card">
+        <label><i class="fas fa-graduation-cap me-1"></i> Filtrar por carrera:</label>
+        <form th:action="@{/tutor/buscarPorCarrera}" method="get"
+              class="d-flex gap-2 flex-wrap align-items-center">
+            <select name="idCarrera" class="form-select" style="max-width: 300px;">
+                <option value="">-- Todas las carreras --</option>
+                <option th:each="c : ${carreras}"
+                        th:value="${c.idCarrera}"
+                        th:text="${c.nombre}"
+                        th:selected="${c.idCarrera == idCarreraSeleccionada}">
+                </option>
+            </select>
+            <button type="submit" class="btn-buscar">
+                <i class="fas fa-search me-1"></i> Buscar
+            </button>
+            <a th:href="@{/tutor/tutores}" class="btn-limpiar">
+                <i class="fas fa-times me-1"></i> Limpiar
+            </a>
+        </form>
+    </div>
+
+    <!-- ALERTA -->
+    <div th:if="${msg != null}" class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${msg}"></span>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <ul class="nav nav-tabs mb-3" id="tabTutores">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-activos" data-bs-toggle="tab" href="#activos">
+                <i class="fas fa-check-circle me-1"></i> Activos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivos" data-bs-toggle="tab" href="#inactivos">
+                <i class="fas fa-times-circle me-1"></i> Inactivos
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PESTAÑA ACTIVOS -->
+        <div class="tab-pane fade show active" id="activos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Foto</th>
+                                <th><i class="fas fa-user me-1"></i> Nombre</th>
+                                <th>Apellido</th>
+                                <th>No. Trabajador</th>
+                                <th><i class="fas fa-phone me-1"></i> Teléfono</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Carrera</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(tutores)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No hay tutores registrados</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="t : ${tutores}" th:if="${t.estatus == 1}">
+                                <td th:text="${t.idTutor}"></td>
+                                <td>
+                                    <img th:src="@{/fotos/tutores/{foto}(foto=${t.foto})}"
+                                         alt="foto"
+                                         style="height:44px; width:44px; object-fit:cover; border-radius:50%; border:2px solid #e0e7ef;"
+                                         th:if="${t.foto != null}">
+                                </td>
+                                <td><span class="tutor-nombre" th:text="${t.nombre}"></span></td>
+                                <td th:text="${t.apellido}"></td>
+                                <td th:text="${t.numeroTrabajador}"></td>
+                                <td th:text="${t.telefono}"></td>
+                                <td th:text="${t.carrera.nombre}"></td>
+                                <td><span class="badge-activo">✔ Activo</span></td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/tutor/ver/{id}(id=${t.idTutor})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/tutor/editar/{id}(id=${t.idTutor})}"
+                                           class="btn-accion btn-editar">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a th:href="@{/tutor/eliminar(id=${t.idTutor})}"
+                                           class="btn-accion btn-eliminar"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este tutor?')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA INACTIVOS -->
+        <div class="tab-pane fade" id="inactivos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Foto</th>
+                                <th><i class="fas fa-user me-1"></i> Nombre</th>
+                                <th>Apellido</th>
+                                <th>No. Trabajador</th>
+                                <th><i class="fas fa-phone me-1"></i> Teléfono</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Carrera</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="t : ${tutores}" th:if="${t.estatus != 1}">
+                                <td th:text="${t.idTutor}"></td>
+                                <td>
+                                    <img th:src="@{/fotos/tutores/{foto}(foto=${t.foto})}"
+                                         alt="foto"
+                                         style="height:44px; width:44px; object-fit:cover; border-radius:50%; border:2px solid #e0e7ef;"
+                                         th:if="${t.foto != null}">
+                                </td>
+                                <td><span class="tutor-nombre" th:text="${t.nombre}"></span></td>
+                                <td th:text="${t.apellido}"></td>
+                                <td th:text="${t.numeroTrabajador}"></td>
+                                <td th:text="${t.telefono}"></td>
+                                <td th:text="${t.carrera.nombre}"></td>
+                                <td><span class="badge-inactivo">✘ Inactivo</span></td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/tutor/activar(id=${t.idTutor})}"
+                                           class="btn-accion btn-ver"
+                                           onclick="return confirm('¿Activar este tutor?')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const tabGuardada = sessionStorage.getItem('tabTutores');
+    if (tabGuardada) {
+        const tab = document.querySelector(tabGuardada);
+        if (tab) new bootstrap.Tab(tab).show();
+        sessionStorage.removeItem('tabTutores');
+    }
+    document.querySelectorAll('#tabTutores .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            sessionStorage.setItem('tabTutores', '#' + this.id);
+        });
+    });
+</script>
+</body>
+</html>

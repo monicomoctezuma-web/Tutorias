@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-calendar-alt me-2"></i> Detalle de la Sesión</h4>
+            <p>Información completa de la sesión seleccionada</p>
+        </div>
+        <a th:href="@{/sesion/sesiones}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- DETALLE -->
+    <div class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-info-circle"></i> Información de la Sesión
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">ID</span>
+                <span class="info-value" th:text="${sesion.idSesion}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Semana</span>
+                <span class="info-value" th:text="${sesion.semana}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Fecha</span>
+                <span class="info-value" th:text="${sesion.fecha}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tutor</span>
+                <span class="info-value"
+                      th:text="${sesion.asignacion.tutor.nombre + ' ' + sesion.asignacion.tutor.apellido}">
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Carrera</span>
+                <span class="info-value" th:text="${sesion.asignacion.carrera.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Semestre</span>
+                <span class="info-value" th:text="${sesion.asignacion.semestre.nombre}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Aula</span>
+                <span class="info-value" th:text="${sesion.asignacion.aula}"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Horario</span>
+                <span class="info-value" th:text="${sesion.asignacion.horario}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN REGRESAR -->
+    <a th:href="@{/sesion/sesiones}" class="btn-regresar">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+    </a>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

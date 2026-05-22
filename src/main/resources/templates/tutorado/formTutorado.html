@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Tutorado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4 th:text="${tutorado.idTutorado != null} ? 'Editar Tutorado' : 'Registrar Tutorado'"></h4>
+            <p>Completa los datos para guardar el tutorado</p>
+        </div>
+        <a th:href="@{/tutorado/tutorados}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <div class="card-header-custom">
+            <i class="fas fa-user-graduate"></i> Datos del Tutorado
+        </div>
+        <div class="p-4">
+            <form id="formTutorado"
+                  th:action="@{/tutorado/tutorados/guardar}"
+                  th:object="${tutorado}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  onsubmit="return validarFormulario()">
+
+                <input type="hidden" th:field="*{idTutorado}">
+                <input type="hidden" th:field="*{estatus}">
+                <input type="hidden" th:field="*{foto}">
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">No. Control</label>
+                    <input type="text" th:field="*{numeroControl}" id="numeroControl"
+                           class="form-control"
+                           placeholder="Ej. 21400123"
+                           maxlength="8"
+                           oninput="soloNumeros(this)">
+                    <div class="text-danger small mt-1" id="errorNumeroControl"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Nombre</label>
+                    <input type="text" th:field="*{nombre}" id="nombre"
+                           class="form-control"
+                           placeholder="Nombre del tutorado">
+                    <div class="text-danger small mt-1" id="errorNombre"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Apellido</label>
+                    <input type="text" th:field="*{apellido}" id="apellido"
+                           class="form-control"
+                           placeholder="Apellido del tutorado">
+                    <div class="text-danger small mt-1" id="errorApellido"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Correo</label>
+                    <input type="text" th:field="*{correo}" id="correo"
+                           class="form-control"
+                           placeholder="correo@ejemplo.com">
+                    <div class="text-danger small mt-1" id="errorCorreo"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Foto</label>
+                    <input type="file" name="fotoArchivo" class="form-control">
+                    
+                     <!-- Mostrar foto actual si existe -->
+    <div th:if="${tutorado.foto != null}" class="mt-2">
+        <p class="text-muted small">Foto actual:</p>
+        <img th:src="@{/fotos/tutorados/{foto}(foto=${tutorado.foto})}"
+             style="height:80px; width:80px; object-fit:cover; border-radius:50%; border:2px solid #e0e7ef;">
+    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Carrera</label>
+                    <select class="form-select" id="carrera" th:field="*{carrera.idCarrera}">
+                        <option value="">-- Selecciona una carrera --</option>
+                        <option th:each="tmpCarrera : ${carreras}"
+                                th:value="${tmpCarrera.idCarrera}"
+                                th:text="${tmpCarrera.nombre}">
+                        </option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorCarrera"></div>
+                </div>
+
+                <!-- Leyenda de campos obligatorios -->
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/tutorado/tutorados}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function soloNumeros(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+
+    function validarFormulario() {
+        let valido = true;
+
+        document.getElementById('errorNumeroControl').textContent = '';
+        document.getElementById('errorNombre').textContent        = '';
+        document.getElementById('errorApellido').textContent      = '';
+        document.getElementById('errorCorreo').textContent        = '';
+        document.getElementById('errorCarrera').textContent       = '';
+
+        const numeroControl = document.getElementById('numeroControl').value.trim();
+        const nombre        = document.getElementById('nombre').value.trim();
+        const apellido      = document.getElementById('apellido').value.trim();
+        const correo        = document.getElementById('correo').value.trim();
+        const carrera       = document.getElementById('carrera').value;
+
+        if (numeroControl === '') {
+            document.getElementById('errorNumeroControl').textContent = '⚠ El número de control es obligatorio.';
+            valido = false;
+        } else if (numeroControl.length !== 8) {
+            document.getElementById('errorNumeroControl').textContent = '⚠ El número de control debe tener exactamente 8 dígitos.';
+            valido = false;
+        }
+
+        if (nombre === '') {
+            document.getElementById('errorNombre').textContent = '⚠ El nombre es obligatorio.';
+            valido = false;
+        }
+
+        if (apellido === '') {
+            document.getElementById('errorApellido').textContent = '⚠ El apellido es obligatorio.';
+            valido = false;
+        }
+
+        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (correo === '') {
+            document.getElementById('errorCorreo').textContent = '⚠ El correo es obligatorio.';
+            valido = false;
+        } else if (!regexCorreo.test(correo)) {
+            document.getElementById('errorCorreo').textContent = '⚠ Ingresa un correo válido. Ej: correo@ejemplo.com';
+            valido = false;
+        }
+
+        if (carrera === '') {
+            document.getElementById('errorCarrera').textContent = '⚠ Selecciona una carrera.';
+            valido = false;
+        }
+
+        return valido;
+    }
+</script>
+</body>
+</html>

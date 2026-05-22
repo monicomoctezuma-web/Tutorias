@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Semestre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4 th:text="${semestre.idSemestre != null} ? 'Editar Semestre' : 'Registrar Semestre'"></h4>
+            <p>Completa los datos para guardar el semestre</p>
+        </div>
+        <a th:href="@{/semestre/semestres}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <div class="card-header-custom">
+            <i class="fas fa-calendar-alt"></i> Datos del Semestre
+        </div>
+        <div class="p-4">
+            <form id="formSemestre"
+                  th:action="@{/semestre/semestres/guardar}"
+                  th:object="${semestre}"
+                  method="post"
+                  onsubmit="return validarFormulario()">
+
+                <input type="hidden" th:field="*{idSemestre}">
+                <input type="hidden" th:field="*{activo}">
+
+                <!-- Campos ocultos que van al backend -->
+                <input type="hidden" th:field="*{nombre}" id="nombre">
+                <input type="hidden" th:field="*{fechaInicio}" id="fechaInicio">
+                <input type="hidden" th:field="*{fechaFin}" id="fechaFin">
+
+                <!-- SELECT: Periodo -->
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Periodo</label>
+                    <select id="selectPeriodo" class="form-select" onchange="autoFechas()">
+                        <option value="">-- Selecciona un periodo --</option>
+                        <option value="Enero-Junio">Enero - Junio</option>
+                        <option value="Agosto-Diciembre">Agosto - Diciembre</option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorPeriodo"></div>
+                </div>
+
+                <!-- SELECT: Año -->
+              <!--    <div class="mb-3">
+                    <label class="form-label campo-requerido">Año</label>
+                    <select id="selectAnio" class="form-select" onchange="autoFechas()">
+                        <option value="">-- Selecciona el año --</option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorAnio"></div>
+                </div> -->
+                
+                <!-- INPUT: Año -->
+<div class="mb-3">
+    <label class="form-label campo-requerido">Año</label>
+    <input type="text" id="selectAnio" class="form-control"
+           placeholder="Ej. 2026"
+           maxlength="4"
+           oninput="this.value = this.value.replace(/[^0-9]/g, ''); autoFechas()">
+    <div class="text-danger small mt-1" id="errorAnio"></div>
+</div>
+
+                <!-- Nombre generado (solo lectura) -->
+                <div class="mb-3">
+                    <label class="form-label">Nombre del Semestre</label>
+                    <input type="text" id="nombreMostrar" class="form-control" readonly
+                           style="background:#f8f9fa;" placeholder="Se generará automáticamente">
+                </div>
+
+                <!-- Fecha Inicio (solo lectura) -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha Inicio</label>
+                    <input type="text" id="fechaInicioMostrar" class="form-control" readonly
+                           style="background:#f8f9fa;" placeholder="Se generará automáticamente">
+                </div>
+
+                <!-- Fecha Fin (solo lectura) -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha Fin</label>
+                    <input type="text" id="fechaFinMostrar" class="form-control" readonly
+                           style="background:#f8f9fa;" placeholder="Se generará automáticamente">
+                </div>
+
+                <!-- Leyenda de campos obligatorios -->
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/semestre/semestres}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Llenar el select de años: año actual y los 2 siguientes
+  
+    
+    
+
+        function autoFechas() {
+    const periodo = document.getElementById('selectPeriodo').value;
+    const anio    = document.getElementById('selectAnio').value;
+
+    if (!periodo || !anio || !/^\d{4}$/.test(anio)) return;
+
+        let fechaInicio, fechaFin, nombreCompleto;
+
+        if (periodo === 'Enero-Junio') {
+            fechaInicio    = `${anio}-01-01`;
+            fechaFin       = `${anio}-06-30`;
+            nombreCompleto = `Enero-Junio ${anio}`;
+        } else {
+            fechaInicio    = `${anio}-08-01`;
+            fechaFin       = `${anio}-12-31`;
+            nombreCompleto = `Agosto-Diciembre ${anio}`;
+        }
+
+        // Llenar campos ocultos que van al backend
+        document.getElementById('nombre').value      = nombreCompleto;
+        document.getElementById('fechaInicio').value = fechaInicio;
+        document.getElementById('fechaFin').value    = fechaFin;
+
+        // Mostrar al usuario en formato legible
+        const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
+        document.getElementById('nombreMostrar').value =
+            nombreCompleto;
+        document.getElementById('fechaInicioMostrar').value =
+            new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-MX', opciones);
+        document.getElementById('fechaFinMostrar').value =
+            new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-MX', opciones);
+    }
+
+    function validarFormulario() {
+        let valido = true;
+
+        document.getElementById('errorPeriodo').textContent = '';
+        document.getElementById('errorAnio').textContent    = '';
+
+        if (!document.getElementById('selectPeriodo').value) {
+            document.getElementById('errorPeriodo').textContent = '⚠ Selecciona un periodo.';
+            valido = false;
+        }
+       
+       const anio = document.getElementById('selectAnio').value.trim();
+if (anio === '') {
+    document.getElementById('errorAnio').textContent = '⚠ El año es obligatorio.';
+    valido = false;
+} else if (!/^\d{4}$/.test(anio)) {
+    document.getElementById('errorAnio').textContent = '⚠ El año debe tener exactamente 4 dígitos numéricos.';
+    valido = false;
+}
+
+        return valido;
+    }
+    
+    // Al cargar la página, preseleccionar si es edición
+window.onload = function() {
+    const nombreActual = document.getElementById('nombre').value;
+    const fechaInicioActual = document.getElementById('fechaInicio').value;
+    const fechaFinActual = document.getElementById('fechaFin').value;
+
+    if (nombreActual !== '') {
+        // Detectar periodo
+        if (nombreActual.startsWith('Enero')) {
+            document.getElementById('selectPeriodo').value = 'Enero-Junio';
+        } else {
+            document.getElementById('selectPeriodo').value = 'Agosto-Diciembre';
+        }
+
+        // Detectar año
+        const anio = nombreActual.split(' ').pop();
+        document.getElementById('selectAnio').value = anio;
+
+        // Mostrar datos
+        document.getElementById('nombreMostrar').value = nombreActual;
+        const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
+        document.getElementById('fechaInicioMostrar').value =
+            new Date(fechaInicioActual + 'T00:00:00').toLocaleDateString('es-MX', opciones);
+        document.getElementById('fechaFinMostrar').value =
+            new Date(fechaFinActual + 'T00:00:00').toLocaleDateString('es-MX', opciones);
+    }
+};
+</script>
+</body>
+</html>

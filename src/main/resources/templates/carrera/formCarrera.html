@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Carrera</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4 th:text="${carrera.idCarrera != null} ? 'Editar Carrera' : 'Registrar Carrera'"></h4>
+            <p>Completa los datos para guardar la carrera</p>
+        </div>
+        <a th:href="@{/carrera/carreras}" class="btn-nueva">
+            <i class="fas fa-arrow-left me-1"></i> Regresar
+        </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <div class="card-header-custom">
+            <i class="fas fa-graduation-cap"></i> Datos de la Carrera
+        </div>
+        <div class="p-4">
+            <form id="formCarrera"
+                  th:action="@{/carrera/carreras/guardar}"
+                  th:object="${carrera}"
+                  method="post"
+                  onsubmit="return validarFormulario()">
+
+                <input type="hidden" th:field="*{idCarrera}">
+                <input type="hidden" th:field="*{estatus}">
+                <input type="hidden" th:field="*{nombre}" id="nombre">
+                <input type="hidden" th:field="*{clave}" id="clave">
+
+                <div class="mb-3">
+                    <label class="form-label campo-requerido">Carrera</label>
+                    <select id="selectCarrera" class="form-select" onchange="autoCompletar()">
+                        <option value="">-- Selecciona una carrera --</option>
+                        <option value="COPU-2010-205">Contador Público</option>
+                        <option value="IGEM-2009-201">Ingeniería en Gestión Empresarial</option>
+                        <option value="ICIV-2010-208">Ingeniería Civil</option>
+                        <option value="ISIC-2010-224">Ingeniería en Sistemas Computacionales</option>
+                        <option value="IINF-2010-220">Ingeniería Informática</option>
+                    </select>
+                    <div class="text-danger small mt-1" id="errorCarrera"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Clave</label>
+                    <input type="text" id="claveMostrar" class="form-control" readonly
+                           style="background:#f8f9fa;" placeholder="Se llenará automáticamente">
+                </div>
+
+                <!-- Leyenda de campos obligatorios -->
+                <p class="text-muted small mt-2">
+                    <span style="color: red; font-weight: bold;">*</span> Campos obligatorios
+                </p>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/carrera/carreras}" class="btn-regresar">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const carreras = {
+        'COPU-2010-205': 'Contador Público',
+        'IGEM-2009-201': 'Ingeniería en Gestión Empresarial',
+        'ICIV-2010-208': 'Ingeniería Civil',
+        'ISIC-2010-224': 'Ingeniería en Sistemas Computacionales',
+        'IINF-2010-220': 'Ingeniería Informática'
+    };
+
+    function autoCompletar() {
+        const clave = document.getElementById('selectCarrera').value;
+
+        if (clave === '') {
+            document.getElementById('claveMostrar').value = '';
+            document.getElementById('nombre').value       = '';
+            document.getElementById('clave').value        = '';
+            return;
+        }
+
+        document.getElementById('nombre').value = carreras[clave];
+        document.getElementById('clave').value  = clave;
+        document.getElementById('claveMostrar').value = clave;
+    }
+
+    function validarFormulario() {
+        let valido = true;
+        document.getElementById('errorCarrera').textContent = '';
+
+        if (document.getElementById('selectCarrera').value === '') {
+            document.getElementById('errorCarrera').textContent = '⚠ Selecciona una carrera.';
+            valido = false;
+        }
+
+        return valido;
+    }
+    
+    // Al cargar la página, preseleccionar si es edición
+window.onload = function() {
+    const claveActual = document.getElementById('clave').value;
+    if (claveActual !== '') {
+        document.getElementById('selectCarrera').value = claveActual;
+        document.getElementById('claveMostrar').value = claveActual;
+    }
+};
+</script>
+</body>
+</html>

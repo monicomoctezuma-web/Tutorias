@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Tutorías</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-graduation-cap me-2"></i> Sistema de Tutorías ITCH</h4>
+            <p>Selecciona un módulo para comenzar</p>
+        </div>
+    </div>
+
+    <!-- CATÁLOGOS -->
+    <div class="seccion-titulo">
+        <i class="fas fa-folder me-2"></i> Catálogos
+    </div>
+    <div class="dashboard-grid">
+
+        <a th:href="@{/rol/roles}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a3a5c, #2a5a8c);">
+                <i class="fas fa-user-tag"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Roles</span>
+                <span class="dash-sub">Gestiona los roles del sistema</span>
+            </div>
+        </a>
+
+        <a th:href="@{/carrera/carreras}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a5c3a, #2a8c5a);">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Carreras</span>
+                <span class="dash-sub">Administra las carreras</span>
+            </div>
+        </a>
+
+        <a th:href="@{/semestre/semestres}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #5c4a1a, #8c6e2a);">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Semestres</span>
+                <span class="dash-sub">Gestiona los periodos escolares</span>
+            </div>
+        </a>
+
+        <a th:href="@{/coordinador/coordinadores}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #3a1a5c, #5a2a8c);">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Coordinadores</span>
+                <span class="dash-sub">Administra los coordinadores</span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- TUTORÍAS -->
+    <div class="seccion-titulo" style="margin-top: 2rem;">
+        <i class="fas fa-chalkboard-teacher me-2"></i> Tutorías
+    </div>
+    <div class="dashboard-grid">
+
+        <a th:href="@{/usuario/usuarios}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a3a5c, #2a5a8c);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Usuarios</span>
+                <span class="dash-sub">Gestiona tutores y roles</span>
+            </div>
+        </a>
+
+        <a th:href="@{/tutorado/tutorados}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #5c1a1a, #8c2a2a);">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Tutorados</span>
+                <span class="dash-sub">Administra los tutorados</span>
+            </div>
+        </a>
+
+        <a th:href="@{/asignacion/lista}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a3a5c, #2a5a8c);">
+                <i class="fas fa-list-check"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Asignaciones</span>
+                <span class="dash-sub">Gestiona las asignaciones</span>
+            </div>
+        </a>
+
+        <a th:href="@{/sesion/sesiones}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a5c3a, #2a8c5a);">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Sesiones</span>
+                <span class="dash-sub">Registra las sesiones de tutoría</span>
+            </div>
+        </a>
+
+        <a th:href="@{/asistencia/asistencias}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #5c4a1a, #8c6e2a);">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Asistencias</span>
+                <span class="dash-sub">Controla la asistencia</span>
+            </div>
+        </a>
+
+        <a th:href="@{/reporte/reportes}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #3a1a5c, #5a2a8c);">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Reportes</span>
+                <span class="dash-sub">Consulta los reportes de sesión</span>
+            </div>
+        </a>
+
+        <a th:href="@{/necesidad/necesidades}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #5c1a1a, #8c2a2a);">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Necesidades</span>
+                <span class="dash-sub">Registra necesidades detectadas</span>
+            </div>
+        </a>
+
+        <a th:href="@{/constancia/constancias}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a5c5c, #2a8c8c);">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">Constancias</span>
+                <span class="dash-sub">Genera constancias de tutoría</span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- PAT -->
+    <div class="seccion-titulo" style="margin-top: 2rem;">
+        <i class="fas fa-book me-2"></i> PAT
+    </div>
+    <div class="dashboard-grid">
+
+        <a th:href="@{/pat/pats}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a3a5c, #2a5a8c);">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">PAT</span>
+                <span class="dash-sub">Programa de Acción Tutorial</span>
+            </div>
+        </a>
+
+        <a th:href="@{/patcarrera/lista}" class="dash-card">
+            <div class="dash-icon" style="background: linear-gradient(135deg, #1a5c3a, #2a8c5a);">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="dash-info">
+                <span class="dash-title">PAT por Carrera</span>
+                <span class="dash-sub">PAT asignado por carrera</span>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

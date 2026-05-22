@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cerrar Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div class="logout-wrapper">
+    <div class="logout-card">
+
+        <!-- Header -->
+        <div class="logout-header">
+            <i class="fas fa-sign-out-alt"></i>
+            <h4>Cerrar Sesión</h4>
+            <p>Sistema de Tutorías — ITCH</p>
+        </div>
+
+        <!-- Body -->
+        <div class="logout-body">
+            <p>¿Estás seguro que deseas salir del sistema?</p>
+            <div style="display:flex; gap:1rem; justify-content:center;">
+                <a href="/" class="btn-cancelar">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <form th:action="@{/logout}" method="post" style="margin:0;">
+                    <button type="submit" class="btn-salir">
+                        <i class="fas fa-sign-out-alt"></i> Sí, cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

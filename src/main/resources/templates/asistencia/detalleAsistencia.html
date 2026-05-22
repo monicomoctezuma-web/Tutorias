@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Asistencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+    <h4 class="mb-4"><i class="fas fa-clipboard-check"></i> Detalle de Asistencia</h4>
+
+    <div class="card shadow" style="max-width: 600px;">
+        <div class="card-header text-white" style="background-color: #1a3a5c;">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de Asistencia</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered mb-0">
+                <tbody>
+                    <tr>
+                        <th class="table-light" style="width:40%"><i class="fas fa-id-badge"></i> ID</th>
+                        <td th:text="${asistencia.idAsistencia}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-user-graduate"></i> Tutorado</th>
+                        <td th:text="${asistencia.tutorado.nombre + ' ' + asistencia.tutorado.apellido}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-id-card"></i> No. Control</th>
+                        <td th:text="${asistencia.tutorado.numeroControl}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-list-ol"></i> Semana</th>
+                        <td th:text="${asistencia.sesion.semana}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-calendar"></i> Fecha</th>
+                        <td th:text="${asistencia.sesion.fecha}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-chalkboard-teacher"></i> Tutor</th>
+                        <td th:text="${asistencia.sesion.asignacion.tutor.nombre + ' ' + asistencia.sesion.asignacion.tutor.apellido}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-graduation-cap"></i> Carrera</th>
+                        <td th:text="${asistencia.sesion.asignacion.carrera.nombre}"></td>
+                    </tr>
+                    <tr>
+                        <th class="table-light"><i class="fas fa-clipboard-check"></i> Presente</th>
+                        <td>
+                            <span th:if="${asistencia.presente == 1}" class="badge bg-success">Presente</span>
+                            <span th:if="${asistencia.presente == 0}" class="badge bg-danger">Ausente</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <a th:href="@{/asistencia/asistencias}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

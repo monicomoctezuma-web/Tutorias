@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-users me-2"></i> Usuarios</h4>
+            <p>Gestiona los usuarios y sus roles en el sistema</p>
+        </div>
+        <a th:href="@{/usuario/usuarios/nuevo}" class="btn-nueva">
+            <i class="fas fa-plus me-1"></i> Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- ALERTA -->
+    <div th:if="${msg != null}" class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${msg}"></span>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <ul class="nav nav-tabs mb-3" id="tabUsuarios">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-activos" data-bs-toggle="tab" href="#activos">
+                <i class="fas fa-check-circle me-1"></i> Activos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivos" data-bs-toggle="tab" href="#inactivos">
+                <i class="fas fa-times-circle me-1"></i> Inactivos
+            </a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" id="tab-credenciales" data-bs-toggle="tab" href="#credenciales">
+            <i class="fas fa-key me-1"></i> Credenciales Tutores
+        </a>
+    </li>
+        
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PESTAÑA ACTIVOS -->
+        <div class="tab-pane fade show active" id="activos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Foto</th>
+                                <th><i class="fas fa-user me-1"></i> Nombre</th>
+                                <th>Apellido</th>
+                                <th>No. Trabajador</th>
+                                <th><i class="fas fa-phone me-1"></i> Teléfono</th>
+                                <th><i class="fas fa-user-tag me-1"></i> Rol</th>
+                                <th>Usuario</th>
+                                <th>Contraseña</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(usuarios)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No hay usuarios registrados</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="u : ${usuarios}" th:if="${u.estatus == 1}">
+                                <td th:text="${u.idUsuario}"></td>
+                                <td>
+                                    <img th:src="@{/fotos/usuarios/{foto}(foto=${u.foto})}"
+                                         alt="foto"
+                                         style="height:44px; width:44px; object-fit:cover; border-radius:50%; border:2px solid #e0e7ef;"
+                                         th:if="${u.foto != null}">
+                                </td>
+                                <td><span class="tutor-nombre" th:text="${u.nombre}"></span></td>
+                                <td th:text="${u.apellido}"></td>
+                                <td th:text="${u.numeroTrabajador}"></td>
+                                <td th:text="${u.telefono}"></td>
+                                <td th:text="${u.rol.nombre}"></td>
+                                
+                                
+                               
+<td>
+    <span th:if="${u.username != null and !#strings.isEmpty(u.username)}"
+          th:text="${u.username}" class="badge bg-primary"></span>
+    <span th:if="${u.username == null or #strings.isEmpty(u.username)}"
+          class="badge bg-secondary">Sin usuario</span>
+</td>
+<td>
+    <span th:if="${u.password != null and !#strings.isEmpty(u.password)}"
+          class="badge bg-success"><i class="fas fa-check"></i> Asignada</span>
+    <span th:if="${u.password == null or #strings.isEmpty(u.password)}"
+          class="badge bg-danger">Sin contraseña</span>
+</td>
+
+                                
+                                <td><span class="badge-activo">✔ Activo</span></td>
+                                
+                                
+                                
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/usuario/ver/{id}(id=${u.idUsuario})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/usuario/editar/{id}(id=${u.idUsuario})}"
+                                           class="btn-accion btn-editar">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a th:href="@{/usuario/eliminar(id=${u.idUsuario})}"
+                                           class="btn-accion btn-eliminar"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA INACTIVOS -->
+        <div class="tab-pane fade" id="inactivos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Foto</th>
+                                <th><i class="fas fa-user me-1"></i> Nombre</th>
+                                <th>No. Trabajador</th>
+                                <th>Apellido</th>
+                                <th><i class="fas fa-phone me-1"></i> Teléfono</th>
+                                <th><i class="fas fa-user-tag me-1"></i> Rol</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="u : ${usuarios}" th:if="${u.estatus != 1}">
+                                <td th:text="${u.idUsuario}"></td>
+                                <td>
+                                    <img th:src="@{/fotos/usuarios/{foto}(foto=${u.foto})}"
+                                         alt="foto"
+                                         style="height:44px; width:44px; object-fit:cover; border-radius:50%; border:2px solid #e0e7ef;"
+                                         th:if="${u.foto != null}">
+                                </td>
+                                <td><span class="tutor-nombre" th:text="${u.nombre}"></span></td>
+                                  <td th:text="${u.numeroTrabajador}"></td>
+                                <td th:text="${u.apellido}"></td>
+                              
+                                <td th:text="${u.telefono}"></td>
+                                <td th:text="${u.rol.nombre}"></td>
+                                <td><span class="badge-inactivo">✘ Inactivo</span></td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/usuario/activar(id=${u.idUsuario})}"
+                                           class="btn-accion btn-ver"
+                                           onclick="return confirm('¿Activar este usuario?')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+
+<!-- PESTAÑA CREDENCIALES TUTORES -->
+        <div class="tab-pane fade" id="credenciales">
+
+            <!-- Buscador -->
+            <div class="card shadow mb-4">
+                <div class="card-body p-4">
+                    <h6 class="mb-3"><i class="fas fa-search me-1"></i> Buscar tutor por número de trabajador</h6>
+
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Número de Trabajador</label>
+                            <div class="input-group">
+                                <input type="text" id="buscarNumero" class="form-control"
+                                       placeholder="Ej. T-12345">
+                                <button class="btn btn-primary" type="button" onclick="buscarTutor()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="text-danger small mt-1" id="errorBusqueda"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" id="nombreTutor" class="form-control" readonly
+                                   placeholder="Automático">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Apellido</label>
+                            <input type="text" id="apellidoTutor" class="form-control" readonly
+                                   placeholder="Automático">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Rol</label>
+                            <input type="text" value="Tutor" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <form id="formCredenciales" th:action="@{/tutor/guardarCredenciales}"
+                          method="post" style="display:none;">
+                        <input type="hidden" id="idTutor" name="idTutor">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Usuario</label>
+                                <input type="text" id="username" name="username" class="form-control"
+                                       placeholder="Ej. jperez">
+                                <div class="text-danger small mt-1" id="errorUsername"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Contraseña</label>
+                                <input type="password" id="password" name="password" class="form-control"
+                                       placeholder="Contraseña">
+                                <div class="text-danger small mt-1" id="errorPassword"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-success w-100" onclick="guardarCredenciales()">
+                                    <i class="fas fa-save me-1"></i> Guardar Credenciales
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla tutores -->
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>No. Trabajador</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Rol</th>
+                                <th>Usuario</th>
+                                <th>Contraseña</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="t : ${tutores}">
+                                <td th:text="${t.numeroTrabajador}"></td>
+                                <td th:text="${t.nombre}"></td>
+                                <td th:text="${t.apellido}"></td>
+                                <td><span class="badge bg-info text-dark">Tutor</span></td>
+                                <td>
+                                    <span th:if="${t.username != null and !#strings.isEmpty(t.username)}"
+                                          th:text="${t.username}" class="badge bg-primary"></span>
+                                    <span th:if="${t.username == null or #strings.isEmpty(t.username)}"
+                                          class="badge bg-secondary">Sin usuario</span>
+                                </td>
+                                <td>
+                                    <span th:if="${t.password != null and !#strings.isEmpty(t.password)}"
+                                          class="badge bg-success">
+                                        <i class="fas fa-check"></i> Asignada
+                                    </span>
+                                    <span th:if="${t.password == null or #strings.isEmpty(t.password)}"
+                                          class="badge bg-danger">Sin contraseña</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- cierre tab-content -->
+    
+    </div> <!-- cierre main-content -->
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const tabGuardada = sessionStorage.getItem('tabUsuarios');
+    if (tabGuardada) {
+        const tab = document.querySelector(tabGuardada);
+        if (tab) new bootstrap.Tab(tab).show();
+        sessionStorage.removeItem('tabUsuarios');
+    }
+    document.querySelectorAll('#tabUsuarios .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            sessionStorage.setItem('tabUsuarios', '#' + this.id);
+        });
+    });
+    
+    function buscarTutor() {
+    const numero = document.getElementById('buscarNumero').value.trim();
+    document.getElementById('errorBusqueda').textContent = '';
+
+    if (numero === '') {
+        document.getElementById('errorBusqueda').textContent = '⚠ Ingresa un número de trabajador.';
+        return;
+    }
+
+    fetch('/tutor/buscarPorNumero?numeroTrabajador=' + encodeURIComponent(numero))
+        .then(res => {
+            if (!res.ok) throw new Error('No encontrado');
+            return res.json();
+        })
+        .then(tutor => {
+            document.getElementById('nombreTutor').value = tutor.nombre;
+            document.getElementById('apellidoTutor').value = tutor.apellido;
+            document.getElementById('idTutor').value = tutor.idTutor;
+            document.getElementById('username').value = tutor.username || '';
+            document.getElementById('password').value = '';
+            document.getElementById('formCredenciales').style.display = 'block';
+        })
+        .catch(() => {
+            document.getElementById('errorBusqueda').textContent = '⚠ No se encontró ningún tutor con ese número.';
+            document.getElementById('formCredenciales').style.display = 'none';
+            document.getElementById('nombreTutor').value = '';
+            document.getElementById('apellidoTutor').value = '';
+        });
+}
+
+function guardarCredenciales() {
+    let valido = true;
+    document.getElementById('errorUsername').textContent = '';
+    document.getElementById('errorPassword').textContent = '';
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (username === '') {
+        document.getElementById('errorUsername').textContent = '⚠ El usuario es obligatorio.';
+        valido = false;
+    }
+    if (password === '') {
+        document.getElementById('errorPassword').textContent = '⚠ La contraseña es obligatoria.';
+        valido = false;
+    }
+    if (valido) {
+        document.getElementById('formCredenciales').submit();
+    }
+}
+
+document.getElementById('buscarNumero').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') buscarTutor();
+});
+</script>
+</body>
+</html>

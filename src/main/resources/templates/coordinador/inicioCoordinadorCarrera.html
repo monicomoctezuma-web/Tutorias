@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio Coordinador de Carrera</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-home me-2"></i> Bienvenido, Coordinador de Carrera</h4>
+            <p>Selecciona una opción para continuar</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-4">
+            <div class="card shadow text-center p-4">
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                <h5>Asignaciones</h5>
+                <p class="text-muted">Asigna tutores y tutorados por carrera y semestre.</p>
+                <a th:href="@{/asignacion/lista}" class="btn btn-primary mt-2">
+                    <i class="fas fa-arrow-right me-1"></i> Ir
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow text-center p-4">
+                <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                <h5>Porcentajes de Asistencia</h5>
+                <p class="text-muted">Consulta el porcentaje de asistencia de los tutorados.</p>
+               <a th:href="@{/asistencia/porcentajes}" class="btn btn-success mt-2">
+                    <i class="fas fa-arrow-right me-1"></i> Ir
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+    <div class="card shadow text-center p-4">
+        <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+        <h5>Necesidades</h5>
+        <p class="text-muted">Consulta las necesidades reportadas por los tutores de tu carrera.</p>
+        <a th:href="@{/necesidad/necesidades}" class="btn btn-warning mt-2">
+            <i class="fas fa-arrow-right me-1"></i> Ir
+        </a>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="card shadow text-center p-4">
+        <i class="fas fa-file-alt fa-3x text-info mb-3"></i>
+        <h5>Reportes</h5>
+        <p class="text-muted">Consulta los reportes de sesiones de los tutores de tu carrera.</p>
+        <a th:href="@{/reporte/reportes}" class="btn btn-info mt-2">
+            <i class="fas fa-arrow-right me-1"></i> Ir
+        </a>
+    </div>
+</div>
+       
+       <div class="col-md-4">
+    <div class="card shadow text-center p-4">
+        <i class="fas fa-award fa-3x mb-3" style="color:#b45309;"></i>
+        <h5>Generar Constancias</h5>
+        <p class="text-muted">Genera constancias por porcentaje de asistencia.</p>
+        <a th:href="@{/constancia/generarConstancias}" class="btn mt-2" style="background:#b45309; color:white;">
+            <i class="fas fa-arrow-right me-1"></i> Ir
+        </a>
+    </div>
+</div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

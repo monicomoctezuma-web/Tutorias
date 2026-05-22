@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-chalkboard-teacher me-2"></i> Asignaciones</h4>
+            <p>Gestiona la asignación de tutores y tutorados por carrera y semestre</p>
+        </div>
+       <a th:href="@{/asignacion/nuevo}" class="btn-nueva"
+   sec:authorize="hasAnyRole('ADMINISTRADOR', 'COORDINADOR_CARRERA', 'JEFE_ACADEMICO')">
+            <i class="fas fa-plus me-1"></i> Nueva Asignación
+        </a>
+    </div>
+
+    <!-- ALERTA -->
+    <div th:if="${msg != null}" class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${msg}"></span>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtro-card" sec:authorize="hasRole('ADMINISTRADOR')" >
+        <label><i class="fas fa-filter me-1"></i> Filtrar:</label>
+
+        <form th:action="@{/asignacion/buscarPorSemestre}" method="get"
+              class="d-flex align-items-center gap-2 flex-wrap">
+            <select name="idSemestre" class="form-select">
+                <option value="">-- Todos los semestres --</option>
+                <option th:each="s : ${semestres}"
+                        th:value="${s.idSemestre}"
+                        th:text="${s.nombre}"
+                        th:selected="${s.idSemestre == idSemestreSeleccionado}">
+                </option>
+            </select>
+            <button type="submit" class="btn-buscar">
+                <i class="fas fa-search me-1"></i> Por Semestre
+            </button>
+        </form>
+
+        <form th:action="@{/asignacion/buscarPorCarrera}" method="get"
+              class="d-flex align-items-center gap-2 flex-wrap">
+            <select name="idCarrera" class="form-select">
+                <option value="">-- Todas las carreras --</option>
+                <option th:each="c : ${carreras}"
+                        th:value="${c.idCarrera}"
+                        th:text="${c.nombre}"
+                        th:selected="${c.idCarrera == idCarreraSeleccionada}">
+                </option>
+            </select>
+            <button type="submit" class="btn-buscar">
+                <i class="fas fa-search me-1"></i> Por Carrera
+            </button>
+        </form>
+
+        <a th:href="@{/asignacion/lista}" class="btn-limpiar">
+            <i class="fas fa-times me-1"></i> Limpiar
+        </a>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <ul class="nav nav-tabs mb-3" id="tabAsignaciones">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-activos" data-bs-toggle="tab" href="#activos">
+                <i class="fas fa-check-circle me-1"></i> Activas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivos" data-bs-toggle="tab" href="#inactivos">
+                <i class="fas fa-times-circle me-1"></i> Inactivas
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PESTAÑA ACTIVAS -->
+        <div class="tab-pane fade show active" id="activos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-user-tie me-1"></i> Tutor</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Carrera</th>
+                                <th><i class="fas fa-calendar me-1"></i> Semestre</th>
+                                <th><i class="fas fa-door-open me-1"></i> Aula</th>
+                                <th><i class="fas fa-clock me-1"></i> Horario</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(asignaciones)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No hay asignaciones registradas</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="a : ${asignaciones}" th:if="${a.estatus == 1}">
+                                <td th:text="${a.idAsignacion}"></td>
+                                <td>
+                                    <span class="tutor-nombre"
+                                          th:text="${a.tutor.nombre + ' ' + a.tutor.apellido}">
+                                    </span>
+                                </td>
+                                <td th:text="${a.carrera.nombre}"></td>
+                                <td th:text="${a.semestre.nombre}"></td>
+                                <td th:text="${a.aula}"></td>
+                                <td th:text="${a.horario}"></td>
+                                <td>
+                                    <span class="badge-activo">
+                                        <i class="fas fa-circle me-1" style="font-size:0.6rem"></i> Activo
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/asignacion/ver/{id}(id=${a.idAsignacion})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/asignacion/editar/{id}(id=${a.idAsignacion})}"
+                                           class="btn-accion btn-editar">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a th:href="@{/asignacion/eliminar(id=${a.idAsignacion})}"
+                                           class="btn-accion btn-eliminar"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar esta asignación?')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                        <a th:href="@{/pdf/tutorados/{id}(id=${a.idAsignacion})}"
+                                           target="_blank" class="btn-accion btn-imprimir">
+                                            <i class="fas fa-print"></i> Imprimir
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA INACTIVAS -->
+        <div class="tab-pane fade" id="inactivos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-user-tie me-1"></i> Tutor</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Carrera</th>
+                                <th><i class="fas fa-calendar me-1"></i> Semestre</th>
+                                <th><i class="fas fa-door-open me-1"></i> Aula</th>
+                                <th><i class="fas fa-clock me-1"></i> Horario</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="a : ${asignaciones}" th:if="${a.estatus != 1}">
+                                <td th:text="${a.idAsignacion}"></td>
+                                <td>
+                                    <span class="tutor-nombre"
+                                          th:text="${a.tutor.nombre + ' ' + a.tutor.apellido}">
+                                    </span>
+                                </td>
+                                <td th:text="${a.carrera.nombre}"></td>
+                                <td th:text="${a.semestre.nombre}"></td>
+                                <td th:text="${a.aula}"></td>
+                                <td th:text="${a.horario}"></td>
+                                <td>
+                                    <span class="badge-inactivo">
+                                        <i class="fas fa-circle me-1" style="font-size:0.6rem"></i> Inactivo
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/asignacion/activar(id=${a.idAsignacion})}"
+                                           class="btn-accion btn-ver"
+                                           onclick="return confirm('¿Activar esta asignación?')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const tabGuardada = sessionStorage.getItem('tabAsignaciones');
+    if (tabGuardada) {
+        const tab = document.querySelector(tabGuardada);
+        if (tab) new bootstrap.Tab(tab).show();
+        sessionStorage.removeItem('tabAsignaciones');
+    }
+    document.querySelectorAll('#tabAsignaciones .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            sessionStorage.setItem('tabAsignaciones', '#' + this.id);
+        });
+    });
+</script>
+</body>
+</html>

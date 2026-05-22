@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Datos PAT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-file-alt me-2"></i> Listado de PATs</h4>
+            <p>Gestiona los Programas de Acción Tutorial registrados</p>
+        </div>
+        <a th:href="@{/pat/pats/nuevo}" class="btn-nueva">
+            <i class="fas fa-plus me-1"></i> Nuevo PAT
+        </a>
+    </div>
+
+    <!-- ALERTA -->
+    <div th:if="${msg != null}" class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${msg}"></span>
+    </div>
+
+    <!-- FILTRO POR FECHA -->
+    <div class="filtro-card">
+        <label><i class="fas fa-calendar me-1"></i> Buscar actividad por fecha:</label>
+        <form th:action="@{/pat/buscarPorFecha}" method="get"
+              class="d-flex align-items-center gap-2 flex-wrap">
+           <!--  <input type="date" name="fecha" class="form-control"
+                   style="max-width: 220px;" th:value="${fechaBuscada}">-->
+                   <input type="date" name="fecha" id="fechaBuscarPat" class="form-control"
+       style="max-width: 220px;" th:value="${fechaBuscada}">
+<small id="errorFechaPat" style="color:red; font-size:0.78rem; display:none;">
+    ⚠ Solo se permiten fechas en viernes.
+</small>
+            <button type="submit" class="btn-buscar">
+                <i class="fas fa-search me-1"></i> Buscar
+            </button>
+            <a th:href="@{/pat/pats}" class="btn-limpiar">
+                <i class="fas fa-times me-1"></i> Limpiar
+            </a>
+        </form>
+    </div>
+
+    <!-- RESULTADOS DE BÚSQUEDA POR FECHA -->
+    <div th:if="${actividades != null}" class="tabla-card mb-4">
+        <div class="card-header-custom">
+            <i class="fas fa-list-check"></i> Actividades encontradas
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Semana</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(actividades)}">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <p>No se encontraron actividades para esta fecha</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="act, iterStat : ${actividades}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td><span class="tutor-nombre" th:text="${act.nombre}"></span></td>
+                        <td th:text="${act.descripcion}"></td>
+                        <td class="text-center" th:text="${act.semana}"></td>
+                        <td th:text="${act.fecha}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <ul class="nav nav-tabs mb-3" id="tabPats">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-activos" data-bs-toggle="tab" href="#activos">
+                <i class="fas fa-check-circle me-1"></i> Activos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivos" data-bs-toggle="tab" href="#inactivos">
+                <i class="fas fa-times-circle me-1"></i> Inactivos
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PESTAÑA ACTIVOS -->
+        <div class="tab-pane fade show active" id="activos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-heading me-1"></i> Título</th>
+                                <th>Descripción</th>
+                                <th><i class="fas fa-calendar-alt me-1"></i> Semestre</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(pats)}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No hay PATs registrados</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="tmpPat : ${pats}" th:if="${tmpPat.estatus == 1}">
+                                <td th:text="${tmpPat.idPat}"></td>
+                                <td><span class="tutor-nombre" th:text="${tmpPat.titulo}"></span></td>
+                                <td th:text="${tmpPat.descripcion}"></td>
+                                <td th:text="${tmpPat.semestre.nombre}"></td>
+                                <td><span class="badge-activo">✔ Activo</span></td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/pat/ver/{id}(id=${tmpPat.idPat})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/pat/editar/{id}(id=${tmpPat.idPat})}"
+                                           class="btn-accion btn-editar">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a th:href="@{/pat/eliminar(id=${tmpPat.idPat})}"
+                                           class="btn-accion btn-eliminar"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar este PAT? También se desactivarán todos sus PATs por carrera.')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                        <a th:href="@{/pdf/pat/{id}(id=${tmpPat.idPat})}"
+                                           target="_blank" class="btn-accion btn-imprimir">
+                                            <i class="fas fa-print"></i> Imprimir
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA INACTIVOS -->
+        <div class="tab-pane fade" id="inactivos">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-heading me-1"></i> Título</th>
+                                <th>Descripción</th>
+                                <th><i class="fas fa-calendar-alt me-1"></i> Semestre</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="tmpPat : ${pats}" th:if="${tmpPat.estatus != 1}">
+                                <td th:text="${tmpPat.idPat}"></td>
+                                <td><span class="tutor-nombre" th:text="${tmpPat.titulo}"></span></td>
+                                <td th:text="${tmpPat.descripcion}"></td>
+                                <td th:text="${tmpPat.semestre.nombre}"></td>
+                                <td><span class="badge-inactivo">✘ Inactivo</span></td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/pat/ver/{id}(id=${tmpPat.idPat})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/pat/activar(id=${tmpPat.idPat})}"
+                                           class="btn-accion btn-ver"
+                                           onclick="return confirm('¿Activar este PAT?')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const tabGuardada = sessionStorage.getItem('tabPats');
+    if (tabGuardada) {
+        const tab = document.querySelector(tabGuardada);
+        if (tab) new bootstrap.Tab(tab).show();
+        sessionStorage.removeItem('tabPats');
+    }
+    document.querySelectorAll('#tabPats .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            sessionStorage.setItem('tabPats', '#' + this.id);
+        });
+    });
+    
+   document.getElementById('fechaBuscarPat').addEventListener('change', function () {
+    const partes = this.value.split('-');
+    const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+    const error = document.getElementById('errorFechaPat');
+    if (this.value && fecha.getDay() !== 5) {
+        error.style.display = 'block';
+        this.value = '';
+    } else {
+        error.style.display = 'none';
+    }
+}); 
+</script>
+</body>
+</html>

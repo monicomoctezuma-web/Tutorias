@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Porcentajes de Asistencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-chart-bar me-2"></i> Porcentajes de Asistencia</h4>
+            <p>Consulta el porcentaje de asistencia de cada tutorado</p>
+        </div>
+    </div>
+
+    <!-- PASO 1: Seleccionar Tutor -->
+    <div class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-chalkboard-teacher"></i> Paso 1 — Selecciona el Tutor
+        </div>
+        <div class="p-3">
+            <form method="get" th:action="@{/asistencia/porcentajes}"
+                  class="d-flex gap-2 flex-wrap align-items-center">
+                <select name="idTutor" class="form-select" style="max-width: 350px;">
+                    <option value="">-- Selecciona un tutor --</option>
+                    <option th:each="t : ${tutores}"
+                            th:value="${t.idTutor}"
+                            th:text="${t.nombre + ' ' + t.apellido}"
+                            th:selected="${t.idTutor == idTutorSeleccionado}">
+                    </option>
+                </select>
+                <button type="submit" class="btn-buscar">
+                    <i class="fas fa-search me-1"></i> Buscar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PASO 2: Seleccionar Asignación -->
+    <div th:if="${asignaciones != null}" class="detalle-card">
+        <div class="card-header-custom">
+            <i class="fas fa-list-check"></i> Paso 2 — Selecciona la Asignación
+        </div>
+        <div class="p-3">
+            <form method="get" th:action="@{/asistencia/porcentajes}"
+                  class="d-flex gap-2 flex-wrap align-items-center">
+                <input type="hidden" name="idTutor" th:value="${idTutorSeleccionado}">
+                <select name="idAsignacion" class="form-select" style="max-width: 450px;">
+                    <option value="">-- Selecciona una asignación --</option>
+                    <option th:each="a : ${asignaciones}"
+                            th:value="${a.idAsignacion}"
+                            th:text="${a.carrera.nombre + ' - ' + a.semestre.nombre + ' | Aula: ' + a.aula}"
+                            th:selected="${a.idAsignacion == idAsignacionSeleccionada}">
+                    </option>
+                </select>
+                <button type="submit" class="btn-buscar">
+                    <i class="fas fa-search me-1"></i> Cargar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TABLA DE PORCENTAJES -->
+    <div th:if="${tutorados != null}" class="tabla-card">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-chart-bar me-2"></i> Porcentaje de Asistencia por Tutorado</span>
+            <div class="d-flex gap-2">
+                <a th:href="@{/pdf/formatoAsistencia/{id}(id=${idAsignacionSeleccionada})}"
+                   class="btn-accion btn-imprimir" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Formato Único
+                </a>
+                <a th:href="@{/pdf/carnets/{id}(id=${idAsignacionSeleccionada})}"
+                   class="btn-accion btn-ver" target="_blank">
+                    <i class="fas fa-id-card"></i> Carnets
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>No. Control</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th class="text-center">Sesiones</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">% Asistencia</th>
+                        <th class="text-center">Estado</th>
+                         <th class="text-center">Carnet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(tutorados)}">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No hay tutorados registrados</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="at, iterStat : ${tutorados}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td>
+                            <span class="numero-control"
+                                  th:text="${at.tutorado.numeroControl}">
+                            </span>
+                        </td>
+                        <td th:text="${at.tutorado.nombre}"></td>
+                        <td th:text="${at.tutorado.apellido}"></td>
+                        <td class="text-center"
+                            th:text="${presencias[at.tutorado.idTutorado]}">
+                        </td>
+                        <td class="text-center">10</td>
+                        <td class="text-center" style="min-width: 120px;">
+                            <div class="progress" style="height: 20px; border-radius: 10px;">
+                                <div class="progress-bar"
+                                     th:classappend="${porcentajes[at.tutorado.idTutorado] >= 80}
+                                                     ? 'bg-success' : 'bg-danger'"
+                                     role="progressbar"
+                                     th:style="'width: ' + ${porcentajes[at.tutorado.idTutorado]} + '%;'"
+                                     th:text="${porcentajes[at.tutorado.idTutorado]} + '%'">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span th:if="${porcentajes[at.tutorado.idTutorado] >= 80}"
+                                  class="badge-activo">
+                                <i class="fas fa-check me-1"></i> Aprobado
+                            </span>
+                            <span th:if="${porcentajes[at.tutorado.idTutorado] < 80}"
+                                  class="badge-inactivo">
+                                <i class="fas fa-times me-1"></i> Pendiente
+                            </span>
+                        </td>
+                        
+                        <td class="text-center">
+    <a th:href="@{/pdf/carnetIndividual/{idAsig}/{idTut}(idAsig=${idAsignacionSeleccionada}, idTut=${at.tutorado.idTutorado})}"
+       class="btn-accion btn-ver" target="_blank">
+        <i class="fas fa-id-card"></i>
+    </a>
+</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

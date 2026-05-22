@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Carreras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <h4><i class="fas fa-graduation-cap me-2"></i> Carreras</h4>
+            <p>Gestiona las carreras registradas en el programa de tutorías</p>
+        </div>
+        <a th:href="@{/carrera/carreras/nuevo}" class="btn-nueva">
+            <i class="fas fa-plus me-1"></i> Nueva Carrera
+        </a>
+    </div>
+
+    <!-- ALERTA -->
+    <div th:if="${msg != null}" class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${msg}"></span>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <ul class="nav nav-tabs mb-3" id="tabCarreras">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-activas" data-bs-toggle="tab" href="#activas">
+                <i class="fas fa-check-circle me-1"></i> Activas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab-inactivas" data-bs-toggle="tab" href="#inactivas">
+                <i class="fas fa-times-circle me-1"></i> Inactivas
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- PESTAÑA ACTIVAS -->
+        <div class="tab-pane fade show active" id="activas">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Nombre</th>
+                                <th><i class="fas fa-tag me-1"></i> Clave</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(carreras)}">
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No hay carreras registradas</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="c : ${carreras}" th:if="${c.estatus == 1}">
+                                <td th:text="${c.idCarrera}"></td>
+                                <td><span class="tutor-nombre" th:text="${c.nombre}"></span></td>
+                                <td th:text="${c.clave}"></td>
+                                <td>
+                                    <span class="badge-activo">✔ Activo</span>
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/carrera/ver/{id}(id=${c.idCarrera})}"
+                                           class="btn-accion btn-ver">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/carrera/editar/{id}(id=${c.idCarrera})}"
+                                           class="btn-accion btn-editar">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a th:href="@{/carrera/eliminar(id=${c.idCarrera})}"
+                                           class="btn-accion btn-eliminar"
+                                           onclick="return confirm('¿Estás seguro de que deseas eliminar esta carrera?')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA INACTIVAS -->
+        <div class="tab-pane fade" id="inactivas">
+            <div class="tabla-card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="fas fa-graduation-cap me-1"></i> Nombre</th>
+                                <th><i class="fas fa-tag me-1"></i> Clave</th>
+                                <th>Estatus</th>
+                                <th>Operaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${carreras}" th:if="${c.estatus != 1}">
+                                <td th:text="${c.idCarrera}"></td>
+                                <td><span class="tutor-nombre" th:text="${c.nombre}"></span></td>
+                                <td th:text="${c.clave}"></td>
+                                <td>
+                                    <span class="badge-inactivo">✘ Inactivo</span>
+                                </td>
+                                <td>
+                                    <div class="acciones">
+                                        <a th:href="@{/carrera/activar(id=${c.idCarrera})}"
+                                           class="btn-accion btn-ver"
+                                           onclick="return confirm('¿Activar esta carrera?')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Mantener pestaña activa al regresar
+    const tabGuardada = sessionStorage.getItem('tabCarreras');
+    if (tabGuardada) {
+        const tab = document.querySelector(tabGuardada);
+        if (tab) new bootstrap.Tab(tab).show();
+        sessionStorage.removeItem('tabCarreras');
+    }
+    document.querySelectorAll('#tabCarreras .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            sessionStorage.setItem('tabCarreras', '#' + this.id);
+        });
+    });
+</script>
+</body>
+</html>

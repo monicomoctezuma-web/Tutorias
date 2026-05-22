@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Tutorías ITCH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; margin: 0; }
+
+        .navbar-publica {
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .navbar-publica .brand { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .navbar-publica .inst { font-size: 0.9rem; opacity: 0.85; }
+
+        .hero {
+            background: linear-gradient(135deg, #1a3a5c 60%, #2a5a8c);
+            color: white;
+            padding: 4.5rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1400&q=80') center/cover;
+            opacity: 0.13;
+        }
+        .hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.5rem; position: relative; letter-spacing: -0.5px; }
+        .hero p { opacity: 0.88; font-size: 1.1rem; position: relative; margin-bottom: 2rem; }
+
+        .hero-search { position: relative; max-width: 560px; margin: 0 auto; }
+        .hero-search form {
+            display: flex; gap: 0.5rem; background: white;
+            border-radius: 50px; padding: 0.4rem 0.4rem 0.4rem 1.2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .hero-search select { flex: 1; border: none; outline: none; font-size: 0.95rem; color: #1a3a5c; background: transparent; }
+        .hero-search input {
+            width: 90px; border: none; border-left: 1px solid #e0e7ef;
+            outline: none; font-size: 0.95rem; color: #1a3a5c; padding: 0 0.8rem; background: transparent;
+        }
+        .hero-search button {
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            color: white; border: none; border-radius: 50px;
+            padding: 0.5rem 1.4rem; font-size: 0.9rem; cursor: pointer; white-space: nowrap;
+        }
+        .hero-search button:hover { opacity: 0.88; }
+        .hero-limpiar {
+            display: inline-block; margin-top: 0.8rem;
+            color: rgba(255,255,255,0.75); font-size: 0.85rem;
+            text-decoration: none; position: relative;
+        }
+        .hero-limpiar:hover { color: white; }
+
+        .stats-bar {
+            background: white; padding: 1.2rem 2rem;
+            display: flex; justify-content: center; gap: 3rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-item .num { font-size: 1.8rem; font-weight: 800; color: #1a3a5c; }
+        .stat-item .lbl { font-size: 0.78rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .contenido { max-width: 1100px; margin: 2.5rem auto; padding: 0 1.2rem; }
+
+        .sec-titulo {
+            font-size: 1.15rem; font-weight: 700; color: #1a3a5c;
+            margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .sec-titulo::after {
+            content: ''; flex: 1; height: 2px;
+            background: linear-gradient(to right, #e0e7ef, transparent); margin-left: 0.5rem;
+        }
+
+        .carreras-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem; margin-bottom: 2.5rem;
+        }
+        .carrera-card {
+            background: white; border-radius: 14px; padding: 1.4rem 1rem;
+            text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border-top: 4px solid #2a5a8c;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer; text-decoration: none;
+        }
+        .carrera-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .carrera-card .icon {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, #e8f0fe, #c8d6f0);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 0.8rem; font-size: 1.3rem; color: #1a3a5c;
+        }
+        .carrera-card .nombre { font-weight: 700; font-size: 0.9rem; color: #1a3a5c; line-height: 1.3; }
+        .carrera-card .clave { font-size: 0.78rem; color: #888; margin-top: 0.3rem; }
+        .carrera-card .ver-detalle { margin-top: 0.8rem; font-size: 0.78rem; color: #2a5a8c; font-weight: 600; }
+
+        .tutores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.2rem; margin-bottom: 0.5rem;
+        }
+        .tutor-card-pub {
+            background: white; border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.08); overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tutor-card-pub:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.13); }
+        .tutor-card-top {
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            padding: 1.5rem 1rem 1rem; text-align: center;
+        }
+        .tutor-foto-pub {
+            width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.4); margin-bottom: 0.5rem;
+        }
+        .tutor-avatar-pub {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: 800; color: white;
+            margin: 0 auto 0.5rem; border: 3px solid rgba(255,255,255,0.3);
+        }
+        .tutor-card-nombre { color: white; font-weight: 700; font-size: 1rem; }
+        .tutor-card-body { padding: 1rem 1.2rem; }
+        .tutor-info-row {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin-bottom: 0.5rem; font-size: 0.85rem; color: #555;
+        }
+        .tutor-info-row i { color: #2a5a8c; width: 16px; text-align: center; }
+
+        .actividades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .actividad-card {
+            background: white; border-radius: 14px; padding: 1.2rem 1.3rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border-left: 5px solid #2a5a8c; transition: transform 0.2s;
+        }
+        .actividad-card:hover { transform: translateY(-3px); }
+        .actividad-semana {
+            display: inline-block; background: #e8f0fe; color: #1a3a5c;
+            font-size: 0.75rem; font-weight: 700; padding: 2px 10px;
+            border-radius: 20px; margin-bottom: 0.6rem;
+        }
+        .actividad-nombre { font-weight: 700; color: #1a3a5c; font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .actividad-desc { font-size: 0.83rem; color: #666; margin-bottom: 0.5rem; }
+        .actividad-fecha { font-size: 0.8rem; color: #888; }
+        .actividad-fecha i { color: #2a5a8c; }
+
+        .empty-pub {
+            text-align: center; color: #aaa; padding: 2.5rem;
+            background: white; border-radius: 14px;
+        }
+        .empty-pub i { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; color: #d0d8e4; }
+
+        .footer-pub {
+            text-align: center; padding: 2rem; color: #888;
+            font-size: 0.85rem; margin-top: 1rem; border-top: 1px solid #e0e7ef;
+        }
+
+        .resultado-label { font-size: 0.85rem; color: #888; margin-bottom: 1rem; }
+        .resultado-label strong { color: #1a3a5c; }
+
+        .modal-content { border-radius: 16px; overflow: hidden; border: none; }
+        .modal-header-custom {
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            color: white; padding: 1.2rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header-custom h5 { margin: 0; font-weight: 700; font-size: 1.05rem; }
+        .modal-header-custom small { opacity: 0.75; font-size: 0.8rem; }
+        .modal-stat-box { flex: 1; border-radius: 10px; padding: 0.9rem 1rem; text-align: center; }
+        .modal-stat-box .ms-label { font-size: 0.72rem; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+        .modal-stat-box .ms-valor { font-weight: 700; color: #1a3a5c; font-size: 1rem; }
+
+        .tutor-row-modal {
+            display: flex; align-items: center; gap: 0.8rem;
+            padding: 0.7rem 0; border-bottom: 1px solid #f0f4f8;
+        }
+        .tutor-row-modal:last-child { border-bottom: none; }
+        .tutor-inicial-modal {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
+        }
+        .tutor-row-nombre { font-weight: 600; font-size: 0.9rem; color: #1a3a5c; }
+        .tutor-row-detalle { font-size: 0.78rem; color: #888; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar-publica">
+    <div class="brand">
+        <i class="fas fa-graduation-cap"></i>
+        Sistema de Tutorías ITCH
+    </div>
+    <div style="display:flex; align-items:center; gap:1rem;">
+        <div class="inst"><i class="fas fa-map-marker-alt me-1"></i> Tecnológico de Chilpancingo</div>
+        <a href="/login" style="background:white; color:#1a3a5c; border-radius:50px;
+           padding:0.4rem 1.2rem; font-size:0.88rem; font-weight:700;
+           text-decoration:none; display:flex; align-items:center; gap:0.4rem;">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </a>
+    </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+    <h1><i class="fas fa-book-open me-2"></i> Consulta de Tutorías</h1>
+    <p>Busca tutores, horarios y actividades del programa de tutorías</p>
+    <div class="hero-search">
+        <form th:action="@{/inicio}" method="get">
+            <select name="idCarrera">
+                <option value="">Selecciona una carrera...</option>
+                <option th:each="c : ${carreras}"
+                        th:value="${c.idCarrera}"
+                        th:text="${c.nombre}"
+                        th:selected="${c.idCarrera == idCarreraSeleccionada}">
+                </option>
+            </select>
+            <input type="number" name="semana" min="1" max="10"
+                   placeholder="Semana" th:value="${semanaSeleccionada}">
+            <button type="submit">
+                <i class="fas fa-search me-1"></i> Buscar
+            </button>
+        </form>
+        <a th:href="@{/inicio}" class="hero-limpiar">
+            <i class="fas fa-times me-1"></i> Limpiar búsqueda
+        </a>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="num" th:text="${#lists.size(carreras)}">0</div>
+        <div class="lbl"><i class="fas fa-graduation-cap me-1"></i> Carreras</div>
+    </div>
+    <div class="stat-item">
+        <div class="num" th:text="${totalTutores != null ? totalTutores : 0}">0</div>
+        <div class="lbl"><i class="fas fa-chalkboard-teacher me-1"></i> Tutores</div>
+    </div>
+    <div class="stat-item">
+        <div class="num" th:text="${totalAsignaciones != null ? totalAsignaciones : 0}">0</div>
+        <div class="lbl"><i class="fas fa-tasks me-1"></i> Asignaciones</div>
+    </div>
+</div>
+
+<div class="contenido">
+
+    <!-- SECCIÓN CARRERAS -->
+    <div class="sec-titulo">
+        <i class="fas fa-graduation-cap"></i> Carreras Disponibles
+        <small style="font-size:0.78rem; font-weight:400; color:#888; margin-left:0.5rem;">
+            — Clic en una tarjeta para ver el detalle
+        </small>
+    </div>
+    <div class="carreras-grid">
+        <div th:each="c : ${carreras}"
+             class="carrera-card"
+             th:data-id="${c.idCarrera}"
+             th:data-nombre="${c.nombre}"
+             th:data-clave="${c.clave}"
+             onclick="abrirModalCarrera(this)">
+            <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="nombre" th:text="${c.nombre}"></div>
+            <div class="clave" th:text="${c.clave}"></div>
+            <div class="ver-detalle"><i class="fas fa-eye me-1"></i> Ver detalle</div>
+            <div class="tutores-data" style="display:none;">
+                <span th:each="a : ${todasAsignaciones}"
+                      th:if="${a.carrera.idCarrera == c.idCarrera}"
+                      th:data-tutor="${a.tutor.nombre + ' ' + a.tutor.apellido}"
+                      th:data-aula="${a.aula}"
+                      th:data-horario="${a.horario}"
+                      th:data-semestre="${a.semestre.nombre}"
+                      class="tutor-item">
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUTORES -->
+    <div th:if="${asignaciones != null}">
+        <div class="sec-titulo"><i class="fas fa-chalkboard-teacher"></i> Tutores Encontrados</div>
+        <div class="resultado-label" th:if="${idCarreraSeleccionada != null}">
+            Mostrando tutores para la carrera seleccionada
+        </div>
+        <div th:if="${#lists.isEmpty(asignaciones)}" class="empty-pub">
+            <i class="fas fa-inbox"></i>
+            No hay tutores registrados para esta carrera.
+        </div>
+        <div th:if="${!#lists.isEmpty(asignaciones)}" class="tutores-grid">
+            <div th:each="a : ${asignaciones}" th:if="${a.estatus == 1}" class="tutor-card-pub">
+                <div class="tutor-card-top">
+                    <img th:if="${a.tutor.foto != null}"
+                         th:src="@{/fotos/tutores/{foto}(foto=${a.tutor.foto})}"
+                         class="tutor-foto-pub" alt="foto">
+                    <div th:if="${a.tutor.foto == null}" class="tutor-avatar-pub"
+                         th:text="${#strings.substring(a.tutor.nombre,0,1)}"></div>
+                    <div class="tutor-card-nombre" th:text="${a.tutor.nombre + ' ' + a.tutor.apellido}"></div>
+                </div>
+                <div class="tutor-card-body">
+                    <div class="tutor-info-row"><i class="fas fa-graduation-cap"></i><span th:text="${a.carrera.nombre}"></span></div>
+                    <div class="tutor-info-row"><i class="fas fa-calendar-alt"></i><span th:text="${a.semestre.nombre}"></span></div>
+                    <div class="tutor-info-row"><i class="fas fa-door-open"></i><span>Aula: <strong th:text="${a.aula}"></strong></span></div>
+                    <div class="tutor-info-row"><i class="fas fa-clock"></i><span th:text="${a.horario}"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVIDADES -->
+    <div th:if="${actividades != null}" style="margin-top: 2rem;">
+        <div class="sec-titulo">
+            <i class="fas fa-tasks"></i> Actividades
+            <span th:if="${semanaSeleccionada != null}" th:text="'— Semana ' + ${semanaSeleccionada}"></span>
+        </div>
+        <div th:if="${#lists.isEmpty(actividades)}" class="empty-pub">
+            <i class="fas fa-calendar-times"></i>
+            No hay actividades registradas para esta semana.
+        </div>
+        <div th:if="${!#lists.isEmpty(actividades)}" class="actividades-grid">
+            <div th:each="a : ${actividades}" class="actividad-card">
+                <span class="actividad-semana">Semana <span th:text="${a.semana}"></span></span>
+                <div class="actividad-nombre" th:text="${a.nombre}"></div>
+                <div class="actividad-desc" th:text="${a.descripcion}"></div>
+                <div class="actividad-fecha">
+                    <i class="fas fa-calendar me-1"></i>
+                    <span th:text="${a.fecha}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL DETALLE CARRERA -->
+<div class="modal fade" id="modalCarrera" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header-custom">
+                <div>
+                    <h5><i class="fas fa-graduation-cap me-2"></i><span id="mc-nombre"></span></h5>
+                    <small>Detalle de carrera</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:1.5rem;">
+                <div style="display:flex; gap:0.8rem; margin-bottom:1.4rem;">
+                    <div class="modal-stat-box" style="background:#f0f4f8;">
+                        <div class="ms-label">Clave</div>
+                        <div class="ms-valor" id="mc-clave"></div>
+                    </div>
+                    <div class="modal-stat-box" style="background:#e8f0fe;">
+                        <div class="ms-label">Tutores asignados</div>
+                        <div class="ms-valor" id="mc-total-tutores">0</div>
+                    </div>
+                    <div class="modal-stat-box" style="background:#e8f5e9;">
+                        <div class="ms-label">Estatus</div>
+                        <div class="ms-valor" style="color:#2e7d32;"><i class="fas fa-check-circle me-1"></i>Activa</div>
+                    </div>
+                </div>
+                <div style="font-weight:700; color:#1a3a5c; font-size:0.88rem; margin-bottom:0.8rem;">
+                    <i class="fas fa-chalkboard-teacher me-1"></i> Tutores de esta carrera
+                </div>
+                <div id="mc-tutores-lista"></div>
+            </div>
+            <div class="modal-footer" style="border:none; padding-top:0; gap:0.5rem;">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cerrar
+                </button>
+                <a id="mc-btn-ver" href="#" class="btn btn-sm"
+                   style="background:linear-gradient(135deg,#1a3a5c,#2a5a8c);color:white;">
+                    <i class="fas fa-search me-1"></i> Ver tutores y actividades
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN PAT GENERAL -->
+<div class="contenido" style="margin-top:0; padding-top:0;">
+
+    <div class="sec-titulo" style="margin-top:1rem;">
+        <i class="fas fa-file-alt"></i> Actividades PAT General
+        <small style="font-size:0.78rem; font-weight:400; color:#888; margin-left:0.5rem;">
+            — Busca por semana y/o fecha
+        </small>
+    </div>
+
+    <div style="background:white; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07);
+                margin-bottom:2rem; overflow:hidden;">
+        <div style="padding:1.2rem 1.5rem; border-bottom:1px solid #f0f4f8;">
+            <form th:action="@{/inicio}" method="get" class="d-flex gap-2 flex-wrap align-items-end">
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#1a3a5c;display:block;margin-bottom:4px;">
+                        <i class="fas fa-calendar-week me-1"></i> Semana
+                    </label>
+                    <input type="number" name="semanaPatGeneral" id="semanaPatGeneral" min="1" max="10"
+                           placeholder="Ej. 3"
+                           th:value="${semanaPatGeneral}"
+                           style="border:1px solid #e0e7ef;border-radius:8px;padding:0.4rem 0.8rem;
+                                  font-size:0.9rem;outline:none;width:100px;"
+                           onchange="validarSemanaPublica(this)">
+                </div>
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#1a3a5c;display:block;margin-bottom:4px;">
+                        <i class="fas fa-calendar me-1"></i> Fecha
+                    </label>
+                    <input type="date" name="fechaPatGeneral" id="fechaPatGeneral"
+                           th:value="${fechaPatGeneral}"
+                           style="border:1px solid #e0e7ef;border-radius:8px;padding:0.4rem 0.8rem;
+                                  font-size:0.9rem;outline:none;">
+                    <small th:if="${errorFechaPatGeneral}" th:text="${errorFechaPatGeneral}"
+                           style="color:red;font-size:0.78rem;display:block;margin-top:3px;"></small>
+                </div>
+                <button type="submit"
+                        style="background:linear-gradient(135deg,#1a3a5c,#2a5a8c);color:white;
+                               border:none;border-radius:8px;padding:0.5rem 1.2rem;font-size:0.88rem;
+                               cursor:pointer;align-self:flex-end;">
+                    <i class="fas fa-search me-1"></i> Buscar
+                </button>
+                <a th:href="@{/inicio}" style="align-self:flex-end;background:#e0e7ef;color:#1a3a5c;
+                   border-radius:8px;padding:0.5rem 1rem;font-size:0.88rem;text-decoration:none;">
+                    <i class="fas fa-times me-1"></i> Limpiar
+                </a>
+            </form>
+        </div>
+
+        <div th:if="${actividadesPatGeneral != null}" style="padding:1.2rem 1.5rem;">
+            <div th:if="${#lists.isEmpty(actividadesPatGeneral)}" class="empty-pub">
+                <i class="fas fa-inbox"></i>
+                No hay actividades para los filtros seleccionados.
+            </div>
+            <div th:if="${!#lists.isEmpty(actividadesPatGeneral)}" class="actividades-grid">
+                <div th:each="a : ${actividadesPatGeneral}" class="actividad-card" style="border-left-color: #e67e22;">
+                    <span class="actividad-semana" style="background:#fef3e2;color:#e67e22;">
+                        Semana <span th:text="${a.semana}"></span>
+                    </span>
+                    <div class="actividad-nombre" th:text="${a.nombre}"></div>
+                    <div class="actividad-desc" th:text="${a.descripcion}"></div>
+                    <div class="actividad-fecha">
+                        <i class="fas fa-calendar me-1" style="color:#e67e22;"></i>
+                        <span th:text="${a.fecha != null ? a.fecha : 'Sin fecha'}"></span>
+                    </div>
+                    <div style="margin-top:0.4rem;font-size:0.78rem;color:#aaa;">
+                        <i class="fas fa-file-alt me-1"></i>
+                        PAT: <span th:text="${a.pat.titulo}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN PAT CARRERA -->
+    <div class="sec-titulo" style="margin-top:1rem;">
+        <i class="fas fa-graduation-cap"></i> Actividades PAT por Carrera
+        <small style="font-size:0.78rem; font-weight:400; color:#888; margin-left:0.5rem;">
+            — Busca por carrera, semana y/o fecha
+        </small>
+    </div>
+
+    <div style="background:white; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07);
+                margin-bottom:2rem; overflow:hidden;">
+        <div style="padding:1.2rem 1.5rem; border-bottom:1px solid #f0f4f8;">
+            <form th:action="@{/inicio}" method="get" class="d-flex gap-2 flex-wrap align-items-end">
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#1a3a5c;display:block;margin-bottom:4px;">
+                        <i class="fas fa-graduation-cap me-1"></i> Carrera
+                    </label>
+                    <select name="idCarreraPatCarrera"
+                            style="border:1px solid #e0e7ef;border-radius:8px;padding:0.4rem 0.8rem;
+                                   font-size:0.9rem;outline:none;min-width:200px;">
+                        <option value="">-- Todas --</option>
+                        <option th:each="c : ${carreras}"
+                                th:value="${c.idCarrera}"
+                                th:text="${c.nombre}"
+                                th:selected="${c.idCarrera == idCarreraPatCarreraSeleccionada}">
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#1a3a5c;display:block;margin-bottom:4px;">
+                        <i class="fas fa-calendar-week me-1"></i> Semana
+                    </label>
+                    <input type="number" name="semanaPatCarrera" id="semanaPatCarrera" min="1" max="10"
+                           placeholder="Ej. 3"
+                           th:value="${semanaPatCarrera}"
+                           style="border:1px solid #e0e7ef;border-radius:8px;padding:0.4rem 0.8rem;
+                                  font-size:0.9rem;outline:none;width:100px;"
+                           onchange="validarSemanaPublica(this)">
+                </div>
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#1a3a5c;display:block;margin-bottom:4px;">
+                        <i class="fas fa-calendar me-1"></i> Fecha
+                    </label>
+                    <input type="date" name="fechaPatCarrera" id="fechaPatCarrera"
+                           th:value="${fechaPatCarrera}"
+                           style="border:1px solid #e0e7ef;border-radius:8px;padding:0.4rem 0.8rem;
+                                  font-size:0.9rem;outline:none;">
+                    <small th:if="${errorFechaPatCarrera}" th:text="${errorFechaPatCarrera}"
+                           style="color:red;font-size:0.78rem;display:block;margin-top:3px;"></small>
+                </div>
+                <button type="submit"
+                        style="background:linear-gradient(135deg,#1a3a5c,#2a5a8c);color:white;
+                               border:none;border-radius:8px;padding:0.5rem 1.2rem;font-size:0.88rem;
+                               cursor:pointer;align-self:flex-end;">
+                    <i class="fas fa-search me-1"></i> Buscar
+                </button>
+                <a th:href="@{/inicio}" style="align-self:flex-end;background:#e0e7ef;color:#1a3a5c;
+                   border-radius:8px;padding:0.5rem 1rem;font-size:0.88rem;text-decoration:none;">
+                    <i class="fas fa-times me-1"></i> Limpiar
+                </a>
+            </form>
+        </div>
+
+        <div th:if="${actividadesPatCarrera != null}" style="padding:1.2rem 1.5rem;">
+            <div th:if="${#lists.isEmpty(actividadesPatCarrera)}" class="empty-pub">
+                <i class="fas fa-inbox"></i>
+                No hay actividades para los filtros seleccionados.
+            </div>
+            <div th:if="${!#lists.isEmpty(actividadesPatCarrera)}" class="actividades-grid">
+                <div th:each="a : ${actividadesPatCarrera}" class="actividad-card">
+                    <span class="actividad-semana">Semana <span th:text="${a.semana}"></span></span>
+                    <div class="actividad-nombre" th:text="${a.nombre}"></div>
+                    <div class="actividad-desc" th:text="${a.descripcion}"></div>
+                    <div class="actividad-fecha">
+                        <i class="fas fa-calendar me-1"></i>
+                        <span th:text="${a.fecha != null ? a.fecha : 'Sin fecha'}"></span>
+                    </div>
+                    <div style="margin-top:0.4rem;font-size:0.78rem;color:#aaa;">
+                        <i class="fas fa-graduation-cap me-1"></i>
+                        <span th:text="${a.patCarrera.carrera.nombre}"></span>
+                        &nbsp;·&nbsp;
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        <span th:text="${a.patCarrera.semestre.nombre}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer-pub">
+    <i class="fas fa-graduation-cap me-1"></i>
+    Sistema de Gestión de Tutorías — Tecnológico de Chilpancingo
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+function soloViernes(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener('change', function () {
+        const partes = this.value.split('-');
+        const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+        if (fecha.getDay() !== 5) {
+            alert('Solo se permiten fechas en viernes.');
+            this.value = '';
+        }
+    });
+}
+
+function validarSemanaPublica(input) {
+    const val = parseInt(input.value);
+    if (isNaN(val) || val < 1 || val > 10) {
+        alert('Solo se permiten semanas del 1 al 10.');
+        input.value = '';
+    }
+}
+
+soloViernes('fechaPatGeneral');
+soloViernes('fechaPatCarrera');
+
+function abrirModalCarrera(el) {
+    const nombre = el.dataset.nombre;
+    const clave  = el.dataset.clave;
+    const id     = el.dataset.id;
+
+    document.getElementById('mc-nombre').textContent = nombre;
+    document.getElementById('mc-clave').textContent  = clave;
+    document.getElementById('mc-btn-ver').href       = '/inicio?idCarrera=' + id;
+
+    const items = el.querySelectorAll('.tutor-item');
+    document.getElementById('mc-total-tutores').textContent = items.length;
+
+    const lista = document.getElementById('mc-tutores-lista');
+    if (items.length === 0) {
+        lista.innerHTML = `
+            <div style="text-align:center;color:#aaa;padding:1.2rem;">
+                <i class="fas fa-inbox" style="font-size:1.8rem;display:block;
+                   margin-bottom:0.5rem;color:#d0d8e4;"></i>
+                Sin tutores asignados a esta carrera
+            </div>`;
+    } else {
+        let html = '';
+        items.forEach(item => {
+            html += `
+            <div class="tutor-row-modal">
+                <div class="tutor-inicial-modal">
+                    ${item.dataset.tutor.charAt(0)}
+                </div>
+                <div style="flex:1;">
+                    <div class="tutor-row-nombre">${item.dataset.tutor}</div>
+                    <div class="tutor-row-detalle">
+                        <i class="fas fa-door-open me-1"></i>Aula ${item.dataset.aula}
+                        &nbsp;·&nbsp;
+                        <i class="fas fa-clock me-1"></i>${item.dataset.horario}
+                        &nbsp;·&nbsp;
+                        <i class="fas fa-calendar-alt me-1"></i>${item.dataset.semestre}
+                    </div>
+                </div>
+            </div>`;
+        });
+        lista.innerHTML = html;
+    }
+
+    new bootstrap.Modal(document.getElementById('modalCarrera')).show();
+}
+
+</script>
+</body>
+</html>

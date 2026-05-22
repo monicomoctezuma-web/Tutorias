@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Asistencia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div th:replace="~{fragmento/fragment :: header}"></div>
+
+<div class="main-content">
+    <h4 class="mb-4" th:text="${asistencia.idAsistencia != null} ? 'Editar Asistencia' : 'Registrar Asistencia'"></h4>
+
+    <div class="card shadow" style="max-width: 600px;">
+        <div class="card-header text-white" style="background-color: #1a3a5c;">
+            <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Datos de Asistencia</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/asistencia/asistencias/guardar}" th:object="${asistencia}" method="post">
+                <input type="hidden" th:field="*{idAsistencia}">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Sesión (Semana - Fecha)</label>
+                    <select class="form-control" th:field="*{sesion.idSesion}">
+                        <option value="">-- Selecciona una sesión --</option>
+                        <option th:each="s : ${sesiones}"
+                                th:value="${s.idSesion}"
+                                th:text="'Semana ' + ${s.semana} + ' - ' + ${s.fecha} + ' | ' + ${s.asignacion.tutor.nombre} + ' ' + ${s.asignacion.tutor.apellido}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tutorado</label>
+                    <select class="form-control" th:field="*{tutorado.idTutorado}">
+                        <option value="">-- Selecciona un tutorado --</option>
+                        <option th:each="t : ${tutorados}"
+                                th:value="${t.idTutorado}"
+                                th:text="${t.nombre + ' ' + t.apellido + ' - ' + t.numeroControl}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Presente</label>
+                    <select class="form-control" th:field="*{presente}">
+                        <option value="1">Presente</option>
+                        <option value="0">Ausente</option>
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a th:href="@{/asistencia/asistencias}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragmento/fragment :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
