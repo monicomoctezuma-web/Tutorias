@@ -59,7 +59,8 @@
         </p>
     </div>
     
-   <a href="/tutor/inicio"
+  <!--   <a href="/tutor/inicio"-->
+  <a th:href="${#authorization.expression('hasRole(''TUTOR'')') ? '/tutor/inicio' : '/'}"
    style="background:linear-gradient(135deg,#1a3a5c,#2a5a8c); color:white;
           border-radius:10px; padding:0.3rem 0.8rem; font-size:0.78rem;
           font-weight:600; text-decoration:none; display:inline-flex;
