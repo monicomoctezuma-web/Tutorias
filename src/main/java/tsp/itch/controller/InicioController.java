@@ -26,9 +26,13 @@ public class InicioController {
     @Autowired private IPatCarreraService patCarreraService;
     @Autowired private IPatService patService;
 
-    @GetMapping("/")
+   /* @GetMapping("/")
     public String home() {
         return "index";
+    }*/
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/inicio";
     }
 
     @GetMapping("/inicio")
