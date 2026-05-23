@@ -12,14 +12,20 @@ public class WebConfig implements WebMvcConfigurer {
 
         // Fotos de usuarios
         registry.addResourceHandler("/fotos/usuarios/**")
-                .addResourceLocations("file:C:/tutorias/usuario/");
+               // .addResourceLocations("file:C:/tutorias/usuario/");
+        .addResourceLocations("file:/app/uploads/usuario/");
+        
 
         // Fotos de tutorados
         registry.addResourceHandler("/fotos/tutorados/**")
-                .addResourceLocations("file:C:/tutorias/tutorado/");
+             //   .addResourceLocations("file:C:/tutorias/tutorado/");
+        .addResourceLocations("file:/app/uploads/tutorado/");
+        
         
      // Fotos de tutores
         registry.addResourceHandler("/fotos/tutores/**")
-                .addResourceLocations("file:C:/tutorias/tutor/");
+               // .addResourceLocations("file:C:/tutorias/tutor/");
+        .addResourceLocations("file:/app/uploads/tutor/");
+
     }
 }
