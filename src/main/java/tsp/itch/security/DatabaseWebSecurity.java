@@ -75,7 +75,11 @@ public class DatabaseWebSecurity implements UserDetailsService {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/login").permitAll()
+               // .requestMatchers("/inicio/**").permitAll()
                 .requestMatchers("/inicio/**").permitAll()
+                .requestMatchers("/inicio").permitAll()
+                .requestMatchers("/").permitAll()
+                
                 .requestMatchers("/fotos/**").permitAll()
                 .requestMatchers("/tutor/inicio").hasRole("TUTOR")
                // .requestMatchers("/tutor/inicio").hasAnyRole("TUTOR", "ADMINISTRADOR")
