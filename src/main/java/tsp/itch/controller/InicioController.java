@@ -34,6 +34,11 @@ public class InicioController {
     public String home() {
         return "redirect:/inicio";
     }
+    
+    @GetMapping("/index")
+    public String index() {
+        return "index";
+    }
 
     @GetMapping("/inicio")
     public String inicio(

@@ -159,7 +159,8 @@ public class DatabaseWebSecurity implements UserDetailsService {
                     } else if (rol.equals("ROLE_DESARROLLO_ACADEMICO")) {
                         response.sendRedirect("/coordinador/inicioDesarrolloAcademico");
                     } else {
-                        response.sendRedirect("/");
+                       // response.sendRedirect("/");
+                    	  response.sendRedirect("/index");
                     }
                 })
                 .permitAll()
